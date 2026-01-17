@@ -1,0 +1,35 @@
+{
+  "label": "PSP",
+  "icon": "psp.png",
+  "iconsel": "psp_sel.png",
+  "themecolor": "64A8BD",
+  "launch": "../../spruce/scripts/emu/standard_launch.sh",
+  "extlist": "iso|cso|chd",
+  "launchlist": [],
+  "menuOptions": {
+    "Governor": {
+      "display": "CPU Mode",
+      "options": [
+        "Smart",
+        "Performance",
+        "Overclock"
+      ],
+      "selected": "Performance",
+      "overrides": {}
+    }
+  },
+  "sortOrder": 5100,
+  "brand": "Sony",
+  "type": "handheld",
+  "releaseYear": 2004,
+  "default_emulator": "standalone",
+  "scaling_min_freq": 1008000,  
+  "devices": [
+    "TRIMUI_BRICK",
+    "TRIMUI_SMART_PRO",
+    "TRIMUI_SMART_PRO_S",
+    "MIYOO_A30",
+    "MIYOO_FLIP",
+    "GKD_PIXEL2"
+  ]
+}

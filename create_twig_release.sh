@@ -1,0 +1,52 @@
+#!/bin/bash
+
+MAINLINE_COMMIT="b26e06964b7acbeaeca424d77104420182973ff1"
+TMP_DIR="tmp/"
+REL_DIR="release/"
+OUT_FILE=twigUI_"$(date +'%d.%m.%Y')"
+
+mkdir -p "${TMP_DIR}${REL_DIR}"
+rm twig*.7z
+rm twig*.img
+rm twig*.zip
+
+# Clone main repo with specific commit
+cd $TMP_DIR
+git clone --revision=$MAINLINE_COMMIT --depth=1 https://github.com/spruceUI/spruceOS.git
+git clone --depth=1 https://github.com/spruceUI/pixel2-base.git
+
+# Setup folders
+GLOBIGNORE=/+/
+rm -rf spruceOS/.git*
+cp -r spruceOS/* $REL_DIR
+
+rm $REL_DIR*.sh
+rm $REL_DIR*.bat
+
+# Copy new files
+cd ..
+cp -rf SDCARD/* "${TMP_DIR}${REL_DIR}"
+
+# Delete uneeded files
+for f in $(cat delete.txt) ; do 
+  rm -r "$f"
+done
+
+# Make archive and clean up
+7z a -t7z -mx=9 -mf- "${OUT_FILE}_update.7z" ./"${TMP_DIR}${REL_DIR}"*
+rm -rf ${TMP_DIR}${REL_DIR}
+
+wget -O "${TMP_DIR}EMUELEC.7z" https://github.com/spruceUI/pixel2-base/releases/download/latest/EMUELEC.7z
+
+# Setup files
+7z x -aoa -o"${TMP_DIR}pixel2-base" "${TMP_DIR}EMUELEC.7z"
+mkdir -p "${TMP_DIR}pixel2-base/storage/"
+cp twig*.7z "${TMP_DIR}pixel2-base/storage/"
+
+# Generate image and cleanup
+genimage --inputpath tmp/pixel2-base/ --tmppath tmp/pixel2-base/tmp
+mv images/IMAGE.img "${OUT_FILE}_install.img"
+zip -m "${OUT_FILE}_install.zip" "${OUT_FILE}_install.img"
+rm -r images/
+rm -r "${TMP_DIR}pixel2-base/storage/"
+
