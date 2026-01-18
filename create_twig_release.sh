@@ -42,7 +42,7 @@ done
 7z a -t7z -mx=9 -mf- "${OUT_FILE}_update.7z" ./"${TMP_DIR}${REL_DIR}"*
 rm -rf ${TMP_DIR}${REL_DIR}
 
-wget -O "${TMP_DIR}EMUELEC.7z" https://github.com/spruceUI/pixel2-base/releases/download/latest/EMUELEC.7z
+wget -nc -O "${TMP_DIR}EMUELEC.7z" https://github.com/spruceUI/pixel2-base/releases/download/latest/EMUELEC.7z
 
 # Setup files
 7z x -aoa -o"${TMP_DIR}pixel2-base" "${TMP_DIR}EMUELEC.7z"
