@@ -8,7 +8,10 @@
 
 prepare_ra_config 2>/dev/null
 cd $RA_DIR/
-HOME="$RA_DIR/" "$RA_DIR/$RA_BIN" -v
+
+CURRENT_CFG=$(get_ra_cfg_location)
+HOME="$RA_DIR/" "$RA_DIR/$RA_BIN" -v --config $CURRENT_CFG --log-file /mnt/SDCARD/Saves/spruce/retroarch.log
+
 backup_ra_config 2>/dev/null
 
 auto_regen_tmp_update
