@@ -1,6 +1,8 @@
 #!/bin/bash
 
 MAINLINE_COMMIT="b26e06964b7acbeaeca424d77104420182973ff1"
+CURRENT_COMMIT=$(cat current_commit.txt)
+
 TMP_DIR="tmp/"
 REL_DIR="release/"
 OUT_FILE=twigUI_"$(date +'%d.%m.%Y')"
@@ -12,8 +14,12 @@ rm twig*.zip
 
 # Clone main repo with specific commit
 cd $TMP_DIR
-git clone --revision=$MAINLINE_COMMIT --depth=1 https://github.com/spruceUI/spruceOS.git
-git clone --depth=1 https://github.com/spruceUI/pixel2-base.git
+
+if [ "$CURRENT_COMMIT" != "$MAINLINE_COMMIT" ]; then
+  rm -r *
+  git clone --revision=$MAINLINE_COMMIT --depth=1 https://github.com/spruceUI/spruceOS.git
+  git clone --depth=1 https://github.com/spruceUI/pixel2-base.git
+fi
 
 # Setup folders
 GLOBIGNORE=/+/
