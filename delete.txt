@@ -5,6 +5,7 @@ tmp/release/App/FileManagement/DinguxCommanderMiyooMini
 tmp/release/App/fn_editor/
 tmp/release/App/GameNursery/
 tmp/release/App/PixelReader/libs32/
+tmp/release/App/PixelReader/reader32
 tmp/release/App/PortMaster/
 tmp/release/App/spruceBackup/
 tmp/release/App/spruceRestore/

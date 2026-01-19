@@ -10,7 +10,7 @@ OUT_FILE=twigUI_"$(date +'%d.%m.%Y')"
 mkdir -p "${TMP_DIR}${REL_DIR}"
 rm twig*.7z
 rm twig*.img
-rm twig*.zip
+rm twig*.img.gz
 
 # Clone main repo with specific commit
 cd $TMP_DIR
@@ -34,7 +34,7 @@ cd ..
 cp -rf SDCARD/* "${TMP_DIR}${REL_DIR}"
 
 # Delete uneeded files
-for f in $(cat delete.txt) ; do 
+for f in $(cat delete.txt) ; do
   rm -r "$f"
 done
 
@@ -52,7 +52,7 @@ cp twig*.7z "${TMP_DIR}pixel2-base/storage/"
 # Generate image and cleanup
 genimage --inputpath tmp/pixel2-base/ --tmppath tmp/pixel2-base/tmp
 mv images/IMAGE.img "${OUT_FILE}_install.img"
-zip -m "${OUT_FILE}_install.zip" "${OUT_FILE}_install.img"
+pigz --best --force "${OUT_FILE}_install.img"
 rm -r images/
 rm -r "${TMP_DIR}pixel2-base/storage/"
 
