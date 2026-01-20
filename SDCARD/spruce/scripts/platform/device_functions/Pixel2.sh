@@ -235,7 +235,7 @@ vibrate() {
             "Strong") intensity=0xFFFF ;;
     esac
 
-    /mnt/SDCARD/spruce/pixel2/bin/rumble $EVENT_PATH_JOYPAD $intensity $duration
+    /mnt/SDCARD/spruce/pixel2/bin/rumble $EVENT_PATH_READ_INPUTS_SPRUCE $intensity $duration
 }
 
 current_backlight() {
@@ -292,7 +292,7 @@ send_virtual_key_L3() {
         sleep 0.1
         echo $B_L3 0 # L3 up
         echo 0 0 0   # tell sendevent to exit
-    } | sendevent $EVENT_PATH_JOYPAD
+    } | sendevent $EVENT_PATH_SEND_TO_RA_AND_PPSSPP
 }
 
 send_menu_button_to_retroarch() {

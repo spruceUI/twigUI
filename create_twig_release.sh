@@ -1,13 +1,12 @@
 #!/bin/bash
 
-MAINLINE_COMMIT="b26e06964b7acbeaeca424d77104420182973ff1"
+MAINLINE_COMMIT="d5bcea8210b0f9a0c0ea5a5177e4406d57afdf76"
 CURRENT_COMMIT=$(cat current_commit.txt)
 
 TMP_DIR="tmp/"
 REL_DIR="release/"
 OUT_FILE=twigUI_"$(date +'%d.%m.%Y')"
 
-mkdir -p "${TMP_DIR}${REL_DIR}"
 rm twig*.7z
 rm twig*.img
 rm twig*.img.gz
@@ -16,9 +15,12 @@ rm twig*.img.gz
 cd $TMP_DIR
 
 if [ "$CURRENT_COMMIT" != "$MAINLINE_COMMIT" ]; then
-  rm -r *
+  rm -rf *
+  mkdir $REL_DIR
+
   git clone --revision=$MAINLINE_COMMIT --depth=1 https://github.com/spruceUI/spruceOS.git
   git clone --depth=1 https://github.com/spruceUI/pixel2-base.git
+  echo $MAINLINE_COMMIT > ../current_commit.txt
 fi
 
 # Setup folders

@@ -41,6 +41,7 @@ run_flycast_standalone() {
 	mount --bind /mnt/SDCARD/BIOS/dc $HOME/data
 
 	cd "$HOME"
+	/mnt/SDCARD/spruce/scripts/asound-setup.sh
 
 	if [ "$CORE" = "Flycast-stock" ]; then
 		./flycast-stock "$ROM_FILE" > ${LOG_DIR}/${CORE}-${PLATFORM}.log 2>&1

@@ -131,7 +131,7 @@ run_retroarch() {
 	log_message "Running CMD: HOME=\"$RA_DIR/\" \"$RA_DIR/$RA_BIN\" -v --log-file /mnt/SDCARD/Saves/spruce/retroarch.log -L \"$CORE_PATH\" \"$ROM_FILE\""
 	#Swap below if debugging
 	
-	/mnt/SDCARD/spruce/scripts/bluetooth/bluetooth.sh "$RA_DIR"
+	/mnt/SDCARD/spruce/scripts/asound-setup.sh "$RA_DIR"
 	
 	if flag_check "developer_mode"; then
 		HOME="$RA_DIR/" "$RA_DIR/$RA_BIN" -v --config $CURRENT_CFG --log-file /mnt/SDCARD/Saves/spruce/retroarch.log -L "$CORE_PATH" "$ROM_FILE"
@@ -209,11 +209,13 @@ transfer_save(){
 		return 1
 	else
 		start_pyui_message_writer
-		log_and_display_message "RetroArch core changed!\n$cached_core_folder to $current_core_folder\nWould you like to transfer your old save?\n(This will remove save-states).\n\nPress A to transfer, or B to continue"
-		if event_joypad_confirm; then
+		log_and_display_message "RetroArch core changed!\n$cached_core_folder to $current_core_folder\nWould you like to transfer your old save?\n(This will remove the auto save-state).\n\nPress A to transfer, or B to continue"
+		if confirm; then
+			log_and_display_message "Transferring saves from\n$cached_core_folder to $current_core_folder"
 			stop_pyui_message_writer
 			return 0
 		else
+			log_and_display_message "Not transferring saves. Launching with new core."
 			stop_pyui_message_writer
 			return 1
 		fi

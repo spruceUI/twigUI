@@ -151,7 +151,7 @@ Press START to continue anyway."
     return 0
 }
 
-event_joypad_confirm() {
+confirm() {
     timeout=${1:-0}         # Default to 0 (no timeout)
     timeout_return=${2:-1}  # Default to 1 (usually 'No' or 'Cancel')
     start_time=$(date +%s)
@@ -159,7 +159,7 @@ event_joypad_confirm() {
     rm -f /tmp/ge_out 2>/dev/null
     
     # Start getevent in the background
-    getevent "$EVENT_PATH_JOYPAD" > /tmp/ge_out &
+    getevent "$EVENT_PATH_READ_INPUTS_SPRUCE" > /tmp/ge_out &
     GE_PID=$!
 
     RET_VAL=2
@@ -167,8 +167,14 @@ event_joypad_confirm() {
         # 1. Check for User Input
         if line=$(tail -n 1 /tmp/ge_out 2>/dev/null); then
             case "$line" in
-                *"key $B_A"*) RET_VAL=0 ;;
-                *"key $B_B"*) RET_VAL=1 ;;
+                *"key $B_A"*) 
+                    RET_VAL=0 
+                    echo "CONFIRM CONFIRMED $(date +%s)" >>"$MESSAGES_FILE"
+                ;;
+                *"key $B_B"*) 
+                    RET_VAL=1 
+                    echo "CONFIRM CANCELLED $(date +%s)" >>"$MESSAGES_FILE"
+                ;;
             esac
         fi
 
@@ -177,6 +183,7 @@ event_joypad_confirm() {
             current_time=$(date +%s)
             elapsed=$((current_time - start_time))
             if [ "$elapsed" -ge "$timeout" ]; then
+                echo "CONFIRM TIMEOUT $(date +%s)" >>"$MESSAGES_FILE"
                 RET_VAL=$timeout_return
             fi
         fi
@@ -186,61 +193,8 @@ event_joypad_confirm() {
     done
 
     kill "$GE_PID" 2>/dev/null
+    display_kill
     return "$RET_VAL"
-}
-
-# Call this to wait for the user to confirm an action
-# Use this with display --confirm to show an image with a confirm/cancel prompt
-# The combined usage would be like
-
-# display -t "Do you want to do this?" --confirm
-# if confirm; then
-#     display -t "You confirmed the action" -d 3
-# else
-#     log_message "User did not confirm" -v
-#     display -t "You did not confirm the action" -d 3
-# fi
-confirm() {
-    timeout=${1:-0}        # Default to 0 (no timeout) if not provided
-    timeout_return=${2:-1} # Default to 1 if not provided
-    start_time=$(date +%s)
-
-    echo "CONFIRM $(date +%s)" >>"$MESSAGES_FILE"
-
-    while true; do
-        # Check for timeout first
-        if [ "$timeout" -ne 0 ]; then
-            current_time=$(date +%s)
-            elapsed_time=$((current_time - start_time))
-            if [ $elapsed_time -ge $timeout ]; then
-                display_kill
-                echo "CONFIRM TIMEOUT $(date +%s)" >>"$MESSAGES_FILE"
-                return $timeout_return
-            fi
-        fi
-
-        # Wait for log message update (with a shorter timeout to allow frequent timeout checks)
-        if ! inotifywait -t 5 "$MESSAGES_FILE" >/dev/null 2>&1; then
-            continue
-        fi
-
-        # Get the last line of log file
-        last_line=$(tail -n 1 "$MESSAGES_FILE")
-        case "$last_line" in
-        # B button - cancel
-        *"$B_B"*)
-            display_kill
-            echo "CONFIRM CANCELLED $(date +%s)" >>"$MESSAGES_FILE"
-            return 1
-            ;;
-        # A button - confirm
-        *"$B_A"*)
-            display_kill
-            echo "CONFIRM CONFIRMED $(date +%s)" >>"$MESSAGES_FILE"
-            return 0
-            ;;
-        esac
-    done
 }
 
 # Call this to dim the screen
@@ -485,7 +439,7 @@ get_current_theme() {
 
 
 get_event() {
-    "/mnt/SDCARD/spruce/bin/getevent" $EVENT_PATH_KEYBOARD
+    "/mnt/SDCARD/spruce/bin/getevent" $EVENT_PATH_READ_INPUTS_SPRUCE
 }
 
 get_version() {
@@ -923,4 +877,41 @@ get_pyui_config_value() {
 set_rgb_in_menu() {
     # todo: make this user-configurable
     rgb_led lrm12 off
+}
+
+set_network_proxy() {
+    enable_proxy="$(get_config_value '.menuOptions."Proxy Settings".enableProxy.selected' "False")"
+    proxy_protocol="$(get_config_value '.menuOptions."Proxy Settings".proxyProtocol.selected' "http")"
+    proxy_address="$(get_config_value '.menuOptions."Proxy Settings".proxyAddress.selected' "")"
+    proxy_port="$(get_config_value '.menuOptions."Proxy Settings".proxyPort.selected' "")"
+
+    proxy=""
+
+    if [ "$enable_proxy" = "True" ]; then
+        if [ -n "$proxy_address" ] && [ -n "$proxy_port" ]; then
+            case "$proxy_port" in
+                *[!0-9]*)
+                    log_message "Invalid proxy port (not a number): $proxy_port"
+                    unset http_proxy https_proxy
+                    return 1
+                    ;;
+            esac
+
+            if [ "$proxy_port" -lt 1 ] || [ "$proxy_port" -gt 65535 ]; then
+                log_message "Invalid proxy port (out of range 1-65535): $proxy_port"
+                unset http_proxy https_proxy
+                return 1
+            fi
+
+            proxy="${proxy_protocol}://${proxy_address}:${proxy_port}"
+        fi
+    fi
+
+    if [ -n "$proxy" ]; then
+        log_message "Set network proxy as $proxy"
+        export http_proxy="$proxy"
+        export https_proxy="$proxy"
+    else
+        unset http_proxy https_proxy
+    fi
 }
