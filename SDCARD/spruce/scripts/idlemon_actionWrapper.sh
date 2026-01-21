@@ -12,7 +12,7 @@ process_name=$1
 case "$process_name" in
     MainUI)
 	    [ "$LED_PATH" != "not applicable" ] && echo heartbeat > "$LED_PATH"/trigger
-		killall -q -0 MainUI
+		pkill -0 -f mainui.py
         alsactl store
 		vibrate &
         sync

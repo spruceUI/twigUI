@@ -6,8 +6,10 @@
 #  we can try to make the file import chain cleaner)
 
 . "/mnt/SDCARD/spruce/scripts/platform/device_functions/utils/legacy_display.sh"
+. "/mnt/SDCARD/spruce/scripts/platform/device_functions/utils/watchdog_launcher.sh"
 . "/mnt/SDCARD/spruce/scripts/platform/device_functions/utils/cpu_control_functions.sh"
 . "/mnt/SDCARD/spruce/scripts/retroarch_utils.sh"
+. "/mnt/SDCARD/spruce/scripts/platform/device_functions/utils/sleep_functions.sh"
 
 get_sftp_service_name() {
     echo "sftpgo"
@@ -72,6 +74,10 @@ device_init() {
     echo "not implemented"
 }
 
+set_event_arg_for_idlemon() {
+    EVENT_ARG="-e /dev/input/event2"
+}
+
 perform_fw_check(){
     log_message "There is only a single firmware, it was never updated" -v
 }
@@ -100,13 +106,7 @@ post_pyui_exit(){
 }
 
 launch_startup_watchdogs(){
-    log_message "Launching Pixel2 startup watchdogs" -v
-
-    /mnt/SDCARD/spruce/scripts/homebutton_watchdog.sh &
-    /mnt/SDCARD/spruce/scripts/applySetting/idlemon_mm.sh &
-    /mnt/SDCARD/spruce/scripts/low_power_warning.sh &
-    # /mnt/SDCARD/spruce/scripts/power_button_watchdog_v2.sh &
-    /mnt/SDCARD/spruce/scripts/buttons_watchdog.sh &
+    launch_common_startup_watchdogs_v2 "false"
 }
 
 # 'Discharging', 'Charging', or 'Full' are possible values. Mind the capitalization.
@@ -150,6 +150,7 @@ get_volume_level() {
 
 set_volume() {
     VOL_VAL="${1:-0}" # default to mute if no value supplied
+    SAVE_TO_CONFIG="${2:-true}" # Optional 2nd arg, defaults to true
 
     logger "Setting volume to $VOL_VAL"
     if [ $VOL_VAL -lt 0 ]; then
@@ -162,8 +163,10 @@ set_volume() {
     SYSTEM_VOL=$(map_mainui_volume_to_system_value "$VOL_VAL")
     pactl -- set-sink-volume @DEFAULT_SINK@ ${SYSTEM_VOL}%
 
-    # Update Config file
-    sed -i "s/\"vol\":\s*\([0-9]*\)/\"vol\": $VOL_VAL/" "$SYSTEM_JSON"
+    if [ "$SAVE_TO_CONFIG" = true ]; then
+        # Update Config file
+        sed -i "s/\"vol\":\s*\([0-9]*\)/\"vol\": $VOL_VAL/" "$SYSTEM_JSON"
+    fi
 }
 
 volume_down() {
@@ -204,6 +207,26 @@ map_mainui_volume_to_system_value() {
         20) echo $SYSTEM_VOLUME_20 ;;
         *) echo $SYSTEM_VOLUME_10 ;;
     esac
+}
+
+WAKE_ALARM_PATH="/sys/class/rtc/rtc0/wakealarm"
+
+device_enter_sleep() {
+    IDLE_TIMEOUT="$1"
+    log_message "Entering sleep w/ IDLE_TIMEOUT of $IDLE_TIMEOUT"
+
+    save_sleep_info "$IDLE_TIMEOUT" || return 1
+    set_wake_alarm "$IDLE_TIMEOUT" "$WAKE_ALARM_PATH" || return 1
+    /usr/lib/systemd/systemd-sleep suspend
+}
+
+device_exit_sleep() {
+    echo 0 >"$WAKE_ALARM_PATH" 2>/dev/null
+}
+
+device_lid_open(){
+    # device has no lid so it's always open
+    return 1
 }
 
 take_screenshot() {
