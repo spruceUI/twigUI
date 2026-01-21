@@ -12,13 +12,13 @@ process_name=$1
 case "$process_name" in
     MainUI)
 	    [ "$LED_PATH" != "not applicable" ] && echo heartbeat > "$LED_PATH"/trigger
-		pkill -0 -f mainui.py
+		killall -q -0 MainUI
         alsactl store
 		vibrate &
         sync
         poweroff
         ;;
-    ra32.miyoo|ra64.miyoo|ra64.trimui|retroarch.Pixel2|retroarch|drastic*|PPSSPP*)
+    ra32.miyoo|ra64.miyoo|ra64.trimui|retroarch*|drastic*|PPSSPP*)
         /mnt/SDCARD/spruce/scripts/save_poweroff.sh
         ;;
     *)

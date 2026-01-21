@@ -71,7 +71,8 @@ get_spruce_ra_cfg_location() {
 }
 
 device_init() {
-    echo "not implemented"
+    touch /mnt/SDCARD/spruce/pixel2/bin/MainUI
+    mount --bind /mnt/SDCARD/spruce/pixel2/bin/python /mnt/SDCARD/spruce/pixel2/bin/MainUI
 }
 
 set_event_arg_for_idlemon() {

@@ -16,12 +16,13 @@ cd $TMP_DIR
 
 if [ "$CURRENT_COMMIT" != "$MAINLINE_COMMIT" ]; then
   rm -rf *
-  mkdir $REL_DIR
 
   git clone --revision=$MAINLINE_COMMIT --depth=1 https://github.com/spruceUI/spruceOS.git
   git clone --depth=1 https://github.com/spruceUI/pixel2-base.git
   echo $MAINLINE_COMMIT > ../current_commit.txt
 fi
+
+mkdir $REL_DIR
 
 # Setup folders
 GLOBIGNORE=/+/

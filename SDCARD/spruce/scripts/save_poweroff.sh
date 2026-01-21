@@ -10,7 +10,7 @@ killall -q -15 principal.sh
 device_prepare_for_poweroff
 
 # Ensure PyUI message writer can run
-pkill -9 -f mainui.py
+killall -q -9 MainUI
 sleep 0.5
 
 FLAGS_DIR="/mnt/SDCARD/spruce/flags"
@@ -140,10 +140,10 @@ flag_remove "emulator_launched"
 alsactl store
 
 # kill MainUI
-pkill -9 -f mainui.py
+killall -q -9 MainUI
 
 # wait until emulator or MainUI exit
-while pkill -0 -f mainui.py; do
+while killall -q -0 MainUI; do
     sleep 0.3
 done
 
