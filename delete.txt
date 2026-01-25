@@ -32,7 +32,8 @@ tmp/release/RetroArch/ra*
 tmp/release/RetroArch/retroarch.[!Pi]*
 tmp/release/Roms/A30PORTS/
 tmp/release/Saves/flip/
-tmp/release/spruce/bin/
+tmp/release/spruce/bin/*[!Syncthing]*
+tmp/release/spruce/bin/Syncthing/bin/
 tmp/release/spruce/a30/
 tmp/release/spruce/brick/
 tmp/release/spruce/FIRMWARE_UPDATE/
