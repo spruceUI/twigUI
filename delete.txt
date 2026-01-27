@@ -8,7 +8,6 @@ tmp/release/App/PixelReader/libs32/
 tmp/release/App/PixelReader/reader32
 tmp/release/App/PortMaster/
 tmp/release/App/ThemeGarden/
-tmp/release/App/USBStorageMode/
 tmp/release/Emu/A30PORTS/
 tmp/release/Emu/EASYRPG/lib-trimui/
 tmp/release/Emu/MEDIA/bin32/
