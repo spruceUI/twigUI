@@ -6,13 +6,11 @@ tmp/release/App/FileManagement/lib-*
 tmp/release/App/FileManagement/DinguxCommander[!Fl][!Pi]*
 tmp/release/App/FileManagement/DinguxCommanderMiyooMini
 tmp/release/App/fn_editor/
-tmp/release/App/GameNursery/
 tmp/release/App/PixelReader/libs32/
 tmp/release/App/PixelReader/reader32
 tmp/release/App/PortMaster/*.txt
 tmp/release/App/PortMaster/*.7z
 tmp/release/App/PortMaster/config.py
-tmp/release/App/ThemeGarden/
 tmp/release/Emu/A30PORTS/
 tmp/release/Emu/EASYRPG/lib-trimui/
 tmp/release/Emu/MEDIA/bin32/
@@ -38,6 +36,7 @@ tmp/release/Roms/A30PORTS/
 tmp/release/Saves/flip/
 tmp/release/spruce/bin/*[!Syncthing]*
 tmp/release/spruce/bin/Syncthing/bin/
+tmp/release/spruce/bin64/wget
 tmp/release/spruce/a30/
 tmp/release/spruce/brick/
 tmp/release/spruce/FIRMWARE_UPDATE/
