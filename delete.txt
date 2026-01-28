@@ -1,3 +1,6 @@
+tmp/release/App/-FirmwareUpdate-/
+tmp/release/App/-OTA/
+tmp/release/App/-Updater/
 tmp/release/App/BootLogo/
 tmp/release/App/FileManagement/lib-*
 tmp/release/App/FileManagement/DinguxCommander[!Fl][!Pi]*
