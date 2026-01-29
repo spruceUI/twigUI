@@ -29,3 +29,4 @@ To install:
 - Copy the extracted files from the update .7z file into the `ROMS` partition of the microSD card.
 - When prompted, allow the new files to replace the existing ones.
 - Once the copying process is done remove the microSD card from the reader, insert it into your handheld and long press the power button to power it up.
+  
