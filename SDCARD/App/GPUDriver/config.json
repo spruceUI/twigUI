@@ -1,6 +1,6 @@
 {
   "label": "Switch GPU Driver",
-  "icon": "menuswitch.png",
+  "icon": "fnkey.png",
   "launch": "launch.sh",
   "description": "Switch between libmali and panfrost",
   "devices": ["GKD_PIXEL2"],
