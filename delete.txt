@@ -33,7 +33,7 @@ tmp/release/RetroArch/.retroarch/cores/
 tmp/release/RetroArch/ra*
 tmp/release/RetroArch/retroarch.[!Pi]*
 tmp/release/Roms/A30PORTS/
-tmp/release/Saves/flip/
+tmp/release/Saves/flip/home/*
 tmp/release/spruce/bin/*[!Syncthing]*
 tmp/release/spruce/bin/Syncthing/bin/
 tmp/release/spruce/bin64/wget
