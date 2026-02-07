@@ -1,1 +1,0 @@
-19008d96010000000221000000010000,pixel2_joypad,platform:Linux,x:b3,a:b0,b:b1,y:b2,guide:b14,back:b8,start:b9,dpleft:b12,dpdown:b11,dpright:b13,dpup:b10,leftshoulder:b4,lefttrigger:b6,rightshoulder:b5,righttrigger:b7,
