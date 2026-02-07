@@ -7,6 +7,11 @@ Spruce for the GKD Pixel 2
 The installation process will wipe everything in your microSD card, make backups of any data you might want to preserve.
 
 To install:
+
+You can use the new All-in-one installer tool! https://github.com/spruceUI/spruceOS-Installer/releases/latest
+
+It downloads and flashes the latest TwigUI release and it available for Windows, Mac and Linux!
+
 - Download [balenaEtcher](https://etcher.balena.io//#download-etcher)
 - Download an install image from the [releases page](https://github.com/spruceUI/twigUI/releases) and extract the .img file.
 - Remove the microSD card from your handheld and insert it into a microSD card reader.
