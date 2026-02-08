@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MAINLINE_COMMIT="5069c1ca25d72e2b40d51b8361f76f1a8f5d7c65"
+MAINLINE_COMMIT="a1fc2fbc39af10612f11ae05e3480506f076f03b"
 CURRENT_COMMIT=$(cat current_commit.txt)
 
 TMP_DIR="tmp/"
@@ -40,6 +40,11 @@ cp -rf SDCARD/* "${TMP_DIR}${REL_DIR}"
 for f in $(cat delete.txt) ; do
   rm -r "$f"
 done
+
+# Extract scummvm
+SCVM_PATH="${TMP_DIR}${REL_DIR}RetroArch/.retroarch/cores64/"
+unzip -d $SCVM_PATH "${SCVM_PATH}scummvm_libretro.zip"
+rm "${SCVM_PATH}scummvm_libretro.zip"
 
 # Make archive and clean up
 7z a -t7z -mx=9 -mf- "${OUT_FILE}_update.7z" ./"${TMP_DIR}${REL_DIR}"*

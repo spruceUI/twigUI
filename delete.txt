@@ -18,7 +18,6 @@ tmp/release/Emu/MEDIA/lib32/
 tmp/release/Emu/NDS/drastic32
 tmp/release/Emu/NDS/lib32_Brick/
 tmp/release/Emu/NDS/lib32_Flip/
-tmp/release/Emu/NDS/lib64_a133p/
 tmp/release/Emu/NDS/lib64_Flip/
 tmp/release/Emu/NDS/libs/
 tmp/release/Emu/NDS/libs_MiyooMini/
@@ -30,6 +29,7 @@ tmp/release/Emu/SATURN/yabasanshiro.trimui
 tmp/release/miyoo/
 tmp/release/miyoo355/
 tmp/release/RetroArch/.retroarch/cores/
+tmp/release/RetroArch/.retroarch/cores64/scummvm_libretro.[!zip]*
 tmp/release/RetroArch/ra*
 tmp/release/RetroArch/retroarch.[!Pi]*
 tmp/release/Roms/A30PORTS/
