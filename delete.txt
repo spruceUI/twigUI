@@ -25,6 +25,8 @@ tmp/release/Emu/OPENBOR/lib/
 tmp/release/Emu/OPENBOR/OpenBOR_[!Tr]*
 tmp/release/Emu/PICO8/lib-*
 tmp/release/Emu/PSP/PPSSPPSDL_[!Pi]*
+tmp/release/Emu/SATURN/.emulationstation
+tmp/release/Emu/SATURN/input.cfg
 tmp/release/Emu/SATURN/yabasanshiro.trimui
 tmp/release/miyoo/
 tmp/release/miyoo355/
