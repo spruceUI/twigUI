@@ -6,3 +6,13 @@ twig*.img
 twig*.img.gz
 current_commit.txt
 *_update/
+
+src/build_emu/flycast
+src/build_emu/libretro*
+src/build_emu/openbor
+src/build_emu/ppsspp
+src/build_emu/RetroArch
+src/build_emu/rk3326_core_builds
+src/build_emu/TIC-80
+src/build_emu/fbalpha2012
+src/build_emu/tyrquake

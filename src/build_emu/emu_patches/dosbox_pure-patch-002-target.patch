@@ -1,0 +1,37 @@
+diff -rupN dosbox-pure.orig/Makefile dosbox-pure/Makefile
+--- dosbox-pure.orig/Makefile	2022-06-06 07:58:30.237591952 -0400
++++ dosbox-pure/Makefile	2022-06-06 08:11:10.555099620 -0400
+@@ -222,6 +222,23 @@ LDLIBS  := -lpthread
+ LDFLAGS += $(CPUFLAGS) -shared
+ #LDFLAGS += -static-libstdc++ -static-libgcc #adds 1MB to output and still dynamically links against libc and libm
+ 
++ifneq (,$(findstring RG351x,$(platform)))
++OUTNAME := dosbox_pure_libretro.so
++BUILD    := RELEASE
++BUILDDIR := release
++CFLAGS   := -DNDEBUG -O3 -fno-ident
++LDFLAGS  += -O3 -fno-ident
++
++CPUFLAGS := -mtune=cortex-a35 -mcpu=cortex-a35 -march=armv8-a+crc+fp+simd
++   
++CFLAGS  += $(CPUFLAGS) -fpic -fomit-frame-pointer -fno-non-call-exceptions -Wno-psabi -Wno-format -fexceptions
++LDFLAGS += $(CPUFLAGS) -lpthread -Wl,--gc-sections -shared
++CXX = $(CC)
++endif
++
++CFLAGS  += -pthread -D__LIBRETRO__ -Iinclude
++$(info Building $(platform) with $(CPUFLAGS))
++
+ .PHONY: all clean
+ all: $(OUTNAME)
+ 
+@@ -245,9 +262,6 @@ ifeq ($(STATIC_LINKING), 1)
+ else
+ 	$(info Linking $@ ...)
+ 	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+-ifneq ($(BUILD),DEBUG)
+-	$(STRIPCMD) $@
+-endif
+ endif
+ 
+ define COMPILE

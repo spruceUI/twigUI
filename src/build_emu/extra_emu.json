@@ -1,0 +1,39 @@
+{
+  "cores": [
+    {
+      "name": "libretro-chailove",
+      "repo": "https://github.com/libretro/libretro-chailove",
+      "script": "chailove.sh"
+    },
+    {
+      "name": "TIC-80",
+      "repo": "https://github.com/nesbox/TIC-80",
+      "script": "tic-80.sh"
+    },
+    {
+      "name": "flycast",
+      "repo": "https://github.com/flyinghead/flycast",
+      "script": "flycast_sa.sh"
+    },
+    {
+      "name": "openbor",
+      "repo": "https://github.com/DCurrent/openbor",
+      "script": "openbor.sh"
+    },
+    {
+      "name": "ppsspp",
+      "repo": "https://github.com/hrydgard/ppsspp",
+      "script": "ppsspp.sh"
+    },
+    {
+      "name": "fbalpha2012",
+      "repo": "https://github.com/libretro/fbalpha2012",
+      "script": "fbalpha2012.sh"
+    },
+    {
+      "name": "tyrquake",
+      "repo": "https://github.com/libretro/tyrquake",
+      "script": "tyrquake.sh"
+    }
+  ]
+}

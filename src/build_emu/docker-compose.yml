@@ -1,0 +1,11 @@
+services:
+  rk-builder-3326-64:
+    build:
+      context: .
+      platforms:
+        - linux/arm64
+    image: rk-builder-3326-64
+    container_name: rk-builder-3326-64
+    privileged: true
+    volumes:
+      - .:/mnt/host
