@@ -41,6 +41,7 @@ cores=(
   "neocd"
   "nestopia"
   "np2kai"
+  "mame2003-plus"
   "o2em"
   "parallel-n64"
   "pcsx_rearmed"
