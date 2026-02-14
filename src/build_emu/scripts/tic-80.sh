@@ -30,5 +30,7 @@ BUILD_OPTS="-DBUILD_LIBRETRO=ON \
             -DBUILD_TOOLS=OFF \
             -DCMAKE_BUILD_TYPE=Release"
 
-cmake $BUILD_OPTS ..
+cmake "$BUILD_OPTS" ..
 cmake --build . --parallel
+
+strip tic80_libretro.so

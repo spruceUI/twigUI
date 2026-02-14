@@ -5,7 +5,7 @@ jsonf=$(cat extra_emu.json)
 if [ $1 = "all" ] ; then
   echo "all"
 
-  while read jvalue
+  while read -r jvalue
   do
     name=$(echo "$jvalue" | jq -r .name)
     repo=$(echo "$jvalue" | jq -r .repo)
@@ -15,7 +15,7 @@ if [ $1 = "all" ] ; then
       git clone --recursive $repo
 
       cd scripts/
-      ./$script
+      ./"$script"
     else
       echo "${name} directory exists, skipping."
     fi
@@ -32,7 +32,7 @@ else
     git clone --recursive $repo
 
     cd scripts/
-    ./$script
+    ./"$script"
   else
     echo "Script not found."
   fi

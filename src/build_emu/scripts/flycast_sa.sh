@@ -12,5 +12,5 @@ BUILD_OPTS="-DUSE_OPENGL=ON \
 
 export CXXFLAGS="${CXXFLAGS} -Wno-error=array-bounds"
 
-cmake $BUILD_OPTS ..
+cmake "$BUILD_OPTS" ..
 make -j$(( $(nproc) - 1 ))
