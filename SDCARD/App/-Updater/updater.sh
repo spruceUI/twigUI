@@ -222,11 +222,11 @@ fi
 
 # Extract version from update file
 log_update_message "Extracting version from update file"
-UPDATE_VERSION=$(echo "$UPDATE_FILE" | sed -n 's/.*spruceV\([0-9.]*\)\(-[0-9]*\)\?.7z$/\1/p')
+UPDATE_VERSION=$(echo "$UPDATE_FILE" | sed -n 's/.*twigUI_V\([0-9.]*\)\(-[0-9]*\)\?.7z$/\1/p')
 log_update_message "Extracted update version: $UPDATE_VERSION"
 
 # Check current version
-CURRENT_VERSION_FILE="/mnt/SDCARD/spruce/spruce"
+CURRENT_VERSION_FILE="/mnt/SDCARD/spruce/twig"
 log_update_message "Checking current version file: $CURRENT_VERSION_FILE"
 if [ -f "$CURRENT_VERSION_FILE" ]; then
     CURRENT_VERSION=$(cat "$CURRENT_VERSION_FILE")
