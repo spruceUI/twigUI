@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MAINLINE_COMMIT="a1fc2fbc39af10612f11ae05e3480506f076f03b"
+MAINLINE_COMMIT="be7335b958ccc63af3311246943b436461eb1e93"
 CURRENT_COMMIT=$(cat current_commit.txt)
 
 TMP_DIR="tmp/"
@@ -12,7 +12,7 @@ rm twig*.img
 rm twig*.img.gz
 
 # Clone main repo with specific commit
-cd $TMP_DIR
+cd "$TMP_DIR"
 
 if [ "$CURRENT_COMMIT" != "$MAINLINE_COMMIT" ]; then
   rm -rf *
