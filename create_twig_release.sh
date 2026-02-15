@@ -1,11 +1,11 @@
 #!/bin/bash
 
-MAINLINE_COMMIT="be7335b958ccc63af3311246943b436461eb1e93"
+MAINLINE_COMMIT="a444c77d4bdf866f9bfbf5bdb4b07f697294a327"
 CURRENT_COMMIT=$(cat current_commit.txt)
 
 TMP_DIR="tmp/"
 REL_DIR="release/"
-OUT_FILE=twigUI_"$(date +'%d.%m.%Y')"
+OUT_FILE=twigUI_V"$(cat SDCARD/spruce/twig)"
 
 rm twig*.7z
 rm twig*.img
