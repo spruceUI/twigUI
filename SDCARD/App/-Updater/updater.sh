@@ -120,8 +120,8 @@ unmount_binds() {
         done
 
         if [ "$SKIP" -eq 0 ]; then
-        echo "[UMOUNT] Attempting to unmount $TARGET"
-        umount "$TARGET" || echo "[ERROR] Failed to unmount $TARGET"
+            echo "[UMOUNT] Attempting to unmount $TARGET"
+            umount "$TARGET" || echo "[ERROR] Failed to unmount $TARGET"
         fi
     fi
     done
@@ -145,7 +145,7 @@ read_only_check
 
 # debug info
 echo "Update is being performed on a $PLATFORM."
-echo "Device firmware is version: $(cat /etc/version)"
+echo "Device firmware is version: $(cat /etc/release)"
 echo "Currently running processes:"
 ps
 echo "Current mounts:"
@@ -222,7 +222,7 @@ fi
 
 # Extract version from update file
 log_update_message "Extracting version from update file"
-UPDATE_VERSION=$(echo "$UPDATE_FILE" | sed -n 's/.*twigUI_V\([0-9.]*\)\(-[0-9]*\)\?.7z$/\1/p')
+UPDATE_VERSION=$(echo "$UPDATE_FILE" | sed -n 's/.*twigUI_\([0-9.]*\)\(-[0-9]*\)\?.7z$/\1/p')
 log_update_message "Extracted update version: $UPDATE_VERSION"
 
 # Check current version
@@ -410,7 +410,7 @@ fi
 sleep 5
 
 # Verify extraction success
-for dir in .tmp_update spruce miyoo miyoo355 trimui; do
+for dir in .tmp_update spruce; do
     if [ ! -d "$dir" ]; then
         log_update_message "Extraction verification failed: $dir missing"
         display_image_and_text "$BAD_IMG" 35 25 "Update extraction incomplete: $dir" 75
@@ -427,7 +427,7 @@ for dir in .tmp_update spruce miyoo miyoo355 trimui; do
 done
 
 log_update_message "Update file extracted successfully"
-display_image_and_text "$LOGO" 35 25 "Now using spruce $UPDATE_VERSION" 75
+display_image_and_text "$LOGO" 35 25 "Now using twig $UPDATE_VERSION" 75
 sleep 5
 
 if [ "$DELETE_UPDATE" = true ]; then
@@ -473,7 +473,7 @@ killall -9 runtime.sh principal.sh MainUI
 
 log_file="/mnt/SDCARD/Saves/spruce/spruce.log"
 if [ "$PLATFORM" = "A30" ]; then
-    poweroff
+    /mnt/SDCARD/spruce/scripts/save_poweroff.sh
 else
     reboot
 fi
