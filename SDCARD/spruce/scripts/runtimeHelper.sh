@@ -51,7 +51,7 @@ update_checker(){
 
 check_for_update_file() {
     echo "Searching for update file"
-    UPDATE_FILE=$(find /mnt/SDCARD/ -maxdepth 1 -name "twigUI_*.7z" | awk -F'V' '{print $2, $0}' | sort -n | tail -n1 | cut -d' ' -f2-)
+    UPDATE_FILE=$(find /mnt/SDCARD/ -maxdepth 1 -name "twigUI_V*.7z" | awk -F'V' '{print $2, $0}' | sort -n | tail -n1 | cut -d' ' -f2-)
     echo "Found update file: $UPDATE_FILE"
 
     if [ -z "$UPDATE_FILE" ]; then

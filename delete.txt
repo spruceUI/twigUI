@@ -5,6 +5,7 @@ tmp/release/App/FileManagement/lib-*
 tmp/release/App/FileManagement/DinguxCommander[!Fl][!Pi]*
 tmp/release/App/FileManagement/DinguxCommanderMiyooMini
 tmp/release/App/fn_editor/
+tmp/release/App/Moonlight/
 tmp/release/App/PixelReader/libs32/
 tmp/release/App/PixelReader/reader32
 tmp/release/App/PortMaster/*.txt

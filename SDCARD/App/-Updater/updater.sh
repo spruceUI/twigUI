@@ -22,7 +22,7 @@ log_update_message() {
 
 check_for_update_file() {
     echo "Searching for update file"
-    UPDATE_FILE=$(find /mnt/SDCARD/ -maxdepth 1 -name "twigUI_*.7z" | awk -F'V' '{print $2, $0}' | sort -n | tail -n1 | cut -d' ' -f2-)
+    UPDATE_FILE=$(find /mnt/SDCARD/ -maxdepth 1 -name "twigUI_V*.7z" | awk -F'V' '{print $2, $0}' | sort -n | tail -n1 | cut -d' ' -f2-)
     echo "Found update file: $UPDATE_FILE"
 
     if [ -z "$UPDATE_FILE" ]; then
@@ -205,7 +205,7 @@ if ! check_for_update_file; then
     sleep 5
     exit 1
 fi
-UPDATE_FILE=$(find /mnt/SDCARD/ -maxdepth 1 -name "twigUI_*.7z" | awk -F'V' '{print $2, $0}' | sort -n | tail -n1 | cut -d' ' -f2-)
+UPDATE_FILE=$(find /mnt/SDCARD/ -maxdepth 1 -name "twigUI_V*.7z" | awk -F'V' '{print $2, $0}' | sort -n | tail -n1 | cut -d' ' -f2-)
 
 # Check battery level
 log_update_message "Checking battery level"
@@ -222,7 +222,7 @@ fi
 
 # Extract version from update file
 log_update_message "Extracting version from update file"
-UPDATE_VERSION=$(echo "$UPDATE_FILE" | sed -n 's/.*twigUI_\([0-9.]*\)\(-[0-9]*\)\?.7z$/\1/p')
+UPDATE_VERSION=$(echo "$UPDATE_FILE" | sed -n 's/.*twigUI_V\([0-9.]*\)\(-[0-9]*\)\?_update.7z$/\1/p')
 log_update_message "Extracted update version: $UPDATE_VERSION"
 
 # Check current version
@@ -433,7 +433,7 @@ sleep 5
 if [ "$DELETE_UPDATE" = true ]; then
     log_update_message "Deleting all update files"
     # Remove all spruce update files matching the pattern
-    find /mnt/SDCARD/ -maxdepth 1 -name "twigUI_*.7z" -exec rm {} \;
+    find /mnt/SDCARD/ -maxdepth 1 -name "twigUI_V*.7z" -exec rm {} \;
     log_update_message "All update files deleted"
 fi
 
