@@ -130,6 +130,7 @@ unmount_binds() {
 
 ##### MAIN EXECUTION #####
 
+sync
 start_pyui_message_writer
 
 # twinkle them lights
@@ -201,7 +202,7 @@ fi
 # Find update 7z file; exit and hide updater app if none exists
 if ! check_for_update_file; then
     display_image_and_text "$BAD_IMG" 35 25 "No update file found" 75
-    sed -i 's|"label"|"#label"|' "$APP_DIR/config.json"
+    jq 'if .label then ."#label" = .label | del(.label) else . end' "$APP_DIR/config.json" > "$APP_DIR/config.json.tmp" && mv "$APP_DIR/config.json.tmp" "$APP_DIR/config.json"
     sleep 5
     exit 1
 fi
@@ -345,6 +346,8 @@ else
     sleep 5
 fi
 
+sync
+
 # Extract update file
 log_update_message "Extracting update file."
 cd /mnt/SDCARD
@@ -406,7 +409,7 @@ else
     display_image_and_text "$LOGO" 35 25 "Update completed!" 75
 fi
 
-
+sync
 sleep 5
 
 # Verify extraction success
@@ -427,7 +430,7 @@ for dir in .tmp_update spruce; do
 done
 
 log_update_message "Update file extracted successfully"
-display_image_and_text "$LOGO" 35 25 "Now using twig $UPDATE_VERSION" 75
+display_image_and_text "$LOGO" 35 25 "Now using twigUI $UPDATE_VERSION" 75
 sleep 5
 
 if [ "$DELETE_UPDATE" = true ]; then
@@ -436,6 +439,8 @@ if [ "$DELETE_UPDATE" = true ]; then
     find /mnt/SDCARD/ -maxdepth 1 -name "twigUI_V*.7z" -exec rm {} \;
     log_update_message "All update files deleted"
 fi
+
+sync
 
 # Restore backup
 /mnt/SDCARD/App/spruceRestore/spruceRestore.sh
@@ -475,5 +480,5 @@ log_file="/mnt/SDCARD/Saves/spruce/spruce.log"
 if [ "$PLATFORM" = "A30" ]; then
     /mnt/SDCARD/spruce/scripts/save_poweroff.sh
 else
-    reboot
+    /mnt/SDCARD/spruce/scripts/save_poweroff.sh --reboot
 fi
