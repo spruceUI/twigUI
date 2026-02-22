@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MAINLINE_COMMIT="ba08591040e6dc0bbab9d3185a78f93670161c7b"
+MAINLINE_COMMIT="c2651e3dc6330e48c44e62ed3102db80d8918f76"
 CURRENT_COMMIT=$(cat current_commit.txt)
 
 TMP_DIR="tmp/"
@@ -40,6 +40,10 @@ cp -rf SDCARD/* "${TMP_DIR}${REL_DIR}"
 for f in $(cat delete.txt) ; do
   rm -r "$f"
 done
+
+if [ "$1" = "release" ]; then
+  rm "${TMP_DIR}${REL_DIR}spruce/flags/developer_mode"
+fi
 
 # Extract scummvm
 SCVM_PATH="${TMP_DIR}${REL_DIR}RetroArch/.retroarch/cores64/"
