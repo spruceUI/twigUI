@@ -1,5 +1,5 @@
 # twigUI
-Spruce for the GKD Pixel 2
+SpruceOS for the GKD Pixel 2
 
 ## Installation
 
@@ -39,3 +39,10 @@ The installation process will wipe everything in your microSD card, make backups
 - Copy the extracted files from the update .7z file into the `ROMS`  partition (labeled as `twigUI` in windows) of the microSD card.
 - When prompted, allow the new files to replace the existing ones.
 - Once the copying process is done remove the microSD card from the reader, insert it into your handheld and long press the power button to power it up.
+
+## Special thanks
+
+- [The spruceOS team](https://github.com/spruceUI/spruceOS?tab=readme-ov-file#active-team-members)
+- [christianhaitian](https://github.com/christianhaitian) for the emulator [build scripts](https://github.com/christianhaitian/rk3326_core_builds).
+- [cscribn](https://github.com/cscribn) for the [docker container](https://github.com/cscribn/rk-core-builder) for the builds scripts.
+- [RetroGFX](https://github.com/RetroGFX) for guidance setting up the build scripts and some patches from [UnofficialOS](https://github.com/RetroGFX/UnofficialOS).
