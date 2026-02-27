@@ -1,17 +1,17 @@
 {
   "cores": [
     {
-      "name": "libretro-chailove",
+      "name": "chailove",
       "repo": "https://github.com/libretro/libretro-chailove",
       "script": "chailove.sh"
     },
     {
-      "name": "TIC-80",
+      "name": "tic-80",
       "repo": "https://github.com/nesbox/TIC-80",
       "script": "tic-80.sh"
     },
     {
-      "name": "flycast",
+      "name": "flycast_sa",
       "repo": "https://github.com/flyinghead/flycast",
       "script": "flycast_sa.sh"
     },
@@ -34,6 +34,11 @@
       "name": "tyrquake",
       "repo": "https://github.com/libretro/tyrquake",
       "script": "tyrquake.sh"
+    },
+    {
+      "name": "gme",
+      "repo": "https://github.com/libretro/libretro-gme",
+      "script": "gme.sh"
     }
   ]
 }

@@ -23,7 +23,7 @@ To build Retroarch:
 
 `build_retroarch.sh`
 
-To build most of the retroarch cores, except mame (using [rk3326_core_builds](https://github.com/christianhaitian/rk3326_core_builds)) :
+To build most of the retroarch cores (using [rk3326_core_builds](https://github.com/christianhaitian/rk3326_core_builds)) :
 
 `build_main_cores.sh`
 

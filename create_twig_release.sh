@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MAINLINE_COMMIT="58d092b7f42a8b346dd8a3d006014c90a0508bfe"
+MAINLINE_COMMIT="9d06e5c0547b29669a827a1a814e1ff9a145d30d"
 CURRENT_COMMIT=$(cat current_commit.txt)
 
 TMP_DIR="tmp/"
