@@ -51,7 +51,7 @@ unzip -d $SCVM_PATH "${SCVM_PATH}scummvm_libretro.zip"
 rm "${SCVM_PATH}scummvm_libretro.zip"
 
 # Make archive and clean up
-7z a -t7z -mx=9 -mf- "${OUT_FILE}_update.7z" ./"${TMP_DIR}${REL_DIR}"*
+7z a -t7z -mx=7 -mf- "${OUT_FILE}_update.7z" ./"${TMP_DIR}${REL_DIR}"*
 rm -rf ${TMP_DIR}${REL_DIR}
 
 wget -nc -O "${TMP_DIR}EMUELEC.7z" https://github.com/spruceUI/pixel2-base/releases/download/latest/EMUELEC.7z
