@@ -41,7 +41,7 @@ check_and_handle_firmware_app() {
 }
 
 check_for_update() {
-    log_message "OTA updates not implemented..."
+    log_message "Device can't boot with wifi on, so don't check for updates at startup."
 }
 
 update_checker(){
