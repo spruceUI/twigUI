@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MAINLINE_COMMIT="0aea2aa78d63a341efd32e130218ce7a5d9924f7"
+MAINLINE_COMMIT="7a2ed213894f9ec493a3ff50201ab55856e1516b"
 CURRENT_COMMIT=$(cat current_commit.txt)
 
 TMP_DIR="tmp/"
@@ -37,6 +37,7 @@ cd ..
 cp -rf SDCARD/* "${TMP_DIR}${REL_DIR}"
 
 # Delete uneeded files
+shopt -s extglob
 for f in $(cat delete.txt) ; do
   rm -r "$f"
 done
