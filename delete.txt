@@ -36,6 +36,7 @@ tmp/release/Emu/OPENBOR/lib/
 tmp/release/Emu/OPENBOR/OpenBOR_[!Tr]*
 tmp/release/Emu/PICO8/lib-*
 tmp/release/Emu/PSP/libstdc++.so.6
+tmp/release/Emu/PSP/*(joy*|miyoo282_xpad_inputd)
 tmp/release/Emu/PSP/PPSSPPSDL_[!Pi]*
 tmp/release/Emu/SATURN/lib64/!(libboost*|libicu*)
 tmp/release/Emu/SATURN/.yabasanshiro/backup.bin
