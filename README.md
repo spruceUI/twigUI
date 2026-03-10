@@ -24,6 +24,18 @@ The installation process will wipe everything in your microSD card, make backups
 
 ## Updating
 
+
+There are two ways of updating to the latest release.
+
+### EZ Updater
+
+- Download the `twigUI_x.x.x_update.7z` file from the [latest release](https://github.com/spruceUI/twigUI/releases) in the releases page.
+- Copy/paste this file directly onto the root of your microSD card (DO NOT EXTRACT THIS FILE).
+- Turn on your device.
+- Go to the "Apps" section and find the "EZ Updater" app and click on it.
+
+It will go through the update process automatically! After it runs and a successful backup of your data it will update and shutdown your device. All you need to do is turn it back on and you're on the latest version.
+
 ### Manual
 
 - Turn off your handheld and remove the microSD card
