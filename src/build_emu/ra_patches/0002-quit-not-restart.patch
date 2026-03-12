@@ -1,12 +1,23 @@
-diff -rupN retroarch.orig/menu/menu_setting.c retroarch/menu/menu_setting.c
---- retroarch.orig/menu/menu_setting.c	2022-03-05 15:34:24.206615672 -0500
-+++ retroarch/menu/menu_setting.c	2022-03-05 20:09:51.435336191 -0500
-@@ -9321,7 +9321,7 @@ static bool setting_append_list(
-          CONFIG_ACTION(
-                list, list_info,
-                MENU_ENUM_LABEL_QUIT_RETROARCH,
--               MENU_ENUM_LABEL_VALUE_RESTART_RETROARCH,
-+               MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
-                &group_info,
+--- a/menu/menu_setting.c	2026-03-11 20:20:01.430166125 -0400
++++ b/menu/menu_setting.c	2026-03-11 20:14:36.177294390 -0400
+@@ -10199,20 +10199,6 @@ static bool setting_append_list(
                 &subgroup_info,
                 parent_group);
+ 
+-#if !defined(IOS) && !defined(HAVE_LAKKA)
+-         if (frontend_driver_has_fork())
+-         {
+-            CONFIG_ACTION(
+-                  list, list_info,
+-                  MENU_ENUM_LABEL_RESTART_RETROARCH,
+-                  MENU_ENUM_LABEL_VALUE_RESTART_RETROARCH,
+-                  &group_info,
+-                  &subgroup_info,
+-                  parent_group);
+-            MENU_SETTINGS_LIST_CURRENT_ADD_CMD(list, list_info, CMD_EVENT_RESTART_RETROARCH);
+-         }
+-#endif
+-
+ #ifdef HAVE_CLOUDSYNC
+          CONFIG_ACTION(
+                list, list_info,

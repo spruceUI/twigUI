@@ -16,6 +16,7 @@ git apply ../ra_patches/*
             --disable-vulkan_display \
             --disable-opengl1 \
             --disable-opengl_core \
+            --disable-jack \
             --enable-alsa \
             --enable-udev \
             --enable-zlib \
