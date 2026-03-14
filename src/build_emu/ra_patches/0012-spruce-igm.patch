@@ -1,0 +1,679 @@
+diff --git a/Makefile.common b/Makefile.common
+index 57dabf5..f147cbd 100644
+--- a/Makefile.common
++++ b/Makefile.common
+@@ -238,6 +238,7 @@ endif
+ 
+ OBJ += frontend/frontend_driver.o \
+        retroarch.o \
++       spruce_igm.o \
+        runloop.o \
+        ui/ui_companion_driver.o \
+        camera/camera_driver.o \
+@@ -1049,6 +1050,7 @@ ifeq ($(HAVE_MENU), 1)
+ 
+    ifeq ($(HAVE_GFX_WIDGETS), 1)
+       DEFINES += -DHAVE_GFX_WIDGETS
++      DEFINES += -DHAVE_SPRUCE_IGM
+    endif
+ 
+    ifeq ($(HAVE_RGUI), 1)
+diff --git a/gfx/gfx_widgets.c b/gfx/gfx_widgets.c
+index 17d4b94..bfc4a87 100644
+--- a/gfx/gfx_widgets.c
++++ b/gfx/gfx_widgets.c
+@@ -38,6 +38,9 @@
+ #include "../configuration.h"
+ #include "../file_path_special.h"
+ #include "../msg_hash.h"
++#ifdef HAVE_SPRUCE_IGM
++#include "../spruce_igm.h"
++#endif
+ 
+ #include "../tasks/task_content.h"
+ #include "../tasks/tasks_internal.h"
+@@ -1576,6 +1579,18 @@ void gfx_widgets_frame(void *data)
+       video_st->current_video->set_viewport(
+             video_st->data, video_width, video_height, true, false);
+ 
++#ifdef HAVE_SPRUCE_IGM
++   /* Spruce IGM takes over the entire widget layer when active */
++   if (spruce_igm_is_active())
++   {
++      spruce_igm_frame(p_disp, userdata, video_width, video_height);
++      if (video_st->current_video && video_st->current_video->set_viewport)
++         video_st->current_video->set_viewport(
++               video_st->data, video_width, video_height, false, true);
++      return;
++   }
++#endif
++
+    /* Font setup */
+    font_driver_bind_block(p_dispwidget->gfx_widget_fonts.regular.font,
+          &p_dispwidget->gfx_widget_fonts.regular.raster_block);
+diff --git a/retroarch.c b/retroarch.c
+index b167283..9128500 100644
+--- a/retroarch.c
++++ b/retroarch.c
+@@ -196,6 +196,9 @@
+ #include "core.h"
+ #include "configuration.h"
+ #include "list_special.h"
++#ifdef HAVE_SPRUCE_IGM
++#include "spruce_igm.h"
++#endif
+ #ifdef HAVE_CHEATS
+ #include "cheat_manager.h"
+ #endif
+diff --git a/runloop.c b/runloop.c
+index 679517b..208a181 100644
+--- a/runloop.c
++++ b/runloop.c
+@@ -208,6 +208,9 @@
+ #include "configuration.h"
+ #include "list_special.h"
+ #include "core_option_manager.h"
++#ifdef HAVE_SPRUCE_IGM
++#include "spruce_igm.h"
++#endif
+ #ifdef HAVE_CHEATS
+ #include "cheat_manager.h"
+ #endif
+@@ -6006,15 +6009,26 @@ static enum runloop_state_enum runloop_check_state(
+ 
+       if (pressed && !old_pressed)
+       {
+-         bool core_is_running    = runloop_st->flags & RUNLOOP_FLAG_CORE_RUNNING;
+-
+-         if (menu_st->flags & MENU_ST_FLAG_ALIVE)
++#ifdef HAVE_SPRUCE_IGM
++         /* Spruce IGM intercepts menu toggle when enabled */
++         if (spruce_igm_is_enabled()
++               && !(menu_st->flags & MENU_ST_FLAG_ALIVE))
+          {
+-            if (rarch_is_initialized && !core_type_is_dummy && core_is_running)
+-               retroarch_menu_running_finished(false);
++            spruce_igm_toggle();
+          }
+          else
+-            retroarch_menu_running();
++#endif
++         {
++            bool core_is_running    = runloop_st->flags & RUNLOOP_FLAG_CORE_RUNNING;
++
++            if (menu_st->flags & MENU_ST_FLAG_ALIVE)
++            {
++               if (rarch_is_initialized && !core_type_is_dummy && core_is_running)
++                  retroarch_menu_running_finished(false);
++            }
++            else
++               retroarch_menu_running();
++         }
+       }
+       /* Initial menu toggle on startup */
+       else if (core_type_is_dummy && !(menu_st->flags & MENU_ST_FLAG_ALIVE))
+@@ -7321,6 +7335,11 @@ int runloop_iterate(void)
+          }
+ #endif
+          video_driver_cached_frame();
++#ifdef HAVE_SPRUCE_IGM
++         /* Process deferred IGM actions now that we're back
++          * in the runloop context (outside the render callback). */
++         spruce_igm_process_pending();
++#endif
+          goto end;
+       case RUNLOOP_STATE_MENU:
+ #if defined(HAVE_MENU) && defined(HAVE_NETWORKING)
+diff --git a/spruce_igm.c b/spruce_igm.c
+new file mode 100644
+index 0000000..0000000
+--- /dev/null
++++ b/spruce_igm.c
+@@ -0,0 +1,523 @@
++/*
++ * Spruce IGM - Simple in-game menu for spruceOS handhelds
++ *
++ * Renders a minimal quick menu over the paused game frame.
++ * Controlled with d-pad and face buttons (no touchscreen needed).
++ *
++ * Architecture: input is polled during rendering (gfx_widgets_frame),
++ * but actions that call command_event are deferred to
++ * spruce_igm_process_pending(), which runs from the runloop
++ * context after rendering completes.  This avoids calling
++ * commands from inside the video driver's render callback
++ * where CMD_EVENT_QUIT can deadlock and CMD_EVENT_LOAD_STATE
++ * interferes with the pause state via run_frames_and_pause.
++ */
++
++#include "spruce_igm.h"
++
++#include <string.h>
++#include <stdio.h>
++#include <unistd.h>
++
++#include "retroarch.h"
++#include "configuration.h"
++#include "command.h"
++#include "runloop.h"
++#include "gfx/gfx_display.h"
++#include "gfx/gfx_widgets.h"
++#include "gfx/video_driver.h"
++#include "gfx/font_driver.h"
++#include "input/input_driver.h"
++#include "menu/menu_driver.h"
++
++/* ── Menu item definitions ─────────────────────────────────── */
++
++enum spruce_igm_item
++{
++   IGM_RESUME = 0,
++   IGM_SAVE_STATE,
++   IGM_LOAD_STATE,
++   IGM_RESET,
++   IGM_RETROARCH,
++   IGM_EXIT,
++   IGM_ITEM_COUNT
++};
++
++static const char *igm_labels[IGM_ITEM_COUNT] = {
++   "Resume",
++   "Save",
++   "Load",
++   "Reset",
++   "RetroArch Menu",
++   "Exit Game"
++};
++
++/* ── Gruvbox-inspired colours ──────────────────────────────── */
++
++static float color_dim_bg[16]     = COLOR_HEX_TO_FLOAT(0x000000, 0.62f);
++static float color_panel[16]      = COLOR_HEX_TO_FLOAT(0x1d2021, 0.95f);
++static float color_title_bg[16]   = COLOR_HEX_TO_FLOAT(0x3c3836, 1.0f);
++static float color_selected[16]   = COLOR_HEX_TO_FLOAT(0xd65d0e, 0.35f);
++static float color_divider[16]    = COLOR_HEX_TO_FLOAT(0x504945, 0.50f);
++
++/* RRGGBBAA format for gfx_display_draw_text */
++#define TEXT_COLOR_NORMAL   0xEBDBB2FFu   /* #EBDBB2 */
++#define TEXT_COLOR_SELECTED 0xFBF1C7FFu   /* #FBF1C7 */
++
++#define IGM_NO_PENDING      -1
++#define IGM_PREVIEW_NO_SLOT  -999
++
++/* ── State ─────────────────────────────────────────────────── */
++
++static struct
++{
++   bool        active;
++   bool        was_paused;       /* pause state before IGM opened  */
++   int         selected;
++   int         pending_action;   /* deferred action, or IGM_NO_PENDING */
++   int         deferred_close;  /* action waiting for button release  */
++   font_data_t *font;
++   font_data_t *font_small;
++   uint16_t    prev_buttons;     /* previous frame joypad bits      */
++   /* Save state preview */
++   uintptr_t   preview_texture;
++   unsigned    preview_tex_w;
++   unsigned    preview_tex_h;
++   int         preview_slot;     /* slot loaded, or IGM_PREVIEW_NO_SLOT */
++} igm;
++
++/* ── Helpers ───────────────────────────────────────────────── */
++
++/* Read all joypad buttons for port 0 as a bitmask */
++static uint16_t igm_read_buttons(void)
++{
++   unsigned i;
++   uint16_t bits = 0;
++   for (i = 0; i <= RETRO_DEVICE_ID_JOYPAD_R3; i++)
++   {
++      if (input_driver_state_wrapper(0, RETRO_DEVICE_JOYPAD, 0, i))
++         bits |= (1 << i);
++   }
++   return bits;
++}
++
++/* Return buttons that just went from released → pressed */
++#define IGM_PRESSED(cur, prev, btn) \
++   (((cur) & (1 << (btn))) && !((prev) & (1 << (btn))))
++
++/* ── Preview texture management ────────────────────────────── */
++
++static void igm_unload_preview(void)
++{
++   if (igm.preview_texture)
++   {
++      video_driver_texture_unload(&igm.preview_texture);
++      igm.preview_texture = 0;
++   }
++   igm.preview_tex_w = 0;
++   igm.preview_tex_h = 0;
++   igm.preview_slot  = IGM_PREVIEW_NO_SLOT;
++}
++
++static void igm_load_preview(int slot)
++{
++   char state_path[8192];
++   size_t len;
++
++   igm_unload_preview();
++
++   if (!runloop_get_savestate_path(state_path, sizeof(state_path), slot))
++      return;
++
++   len = strlen(state_path);
++   snprintf(state_path + len, sizeof(state_path) - len, ".png");
++
++   if (access(state_path, F_OK) != 0)
++      return;
++
++   gfx_display_reset_icon_texture(state_path, &igm.preview_texture,
++         TEXTURE_FILTER_MIPMAP_LINEAR,
++         &igm.preview_tex_w, &igm.preview_tex_h);
++
++   igm.preview_slot = slot;
++}
++
++static void igm_update_preview(void)
++{
++   if (igm.selected == IGM_SAVE_STATE || igm.selected == IGM_LOAD_STATE)
++   {
++      settings_t *settings = config_get_ptr();
++      int slot = settings->ints.state_slot;
++      if (slot != igm.preview_slot)
++         igm_load_preview(slot);
++   }
++   else
++   {
++      if (igm.preview_texture)
++         igm_unload_preview();
++   }
++}
++
++/* ── Enable check (file-based flag) ────────────────────────── */
++
++#define IGM_FLAG_PATH "/mnt/SDCARD/RetroArch/IGM.txt"
++
++bool spruce_igm_is_enabled(void)
++{
++   return access(IGM_FLAG_PATH, F_OK) == 0;
++}
++
++/* ── Toggle (called from runloop context) ──────────────────── */
++
++void spruce_igm_toggle(void)
++{
++   if (igm.active)
++   {
++      /* Close IGM — safe to call commands here (runloop context) */
++      igm.active         = false;
++      igm.pending_action = IGM_NO_PENDING;
++      igm_unload_preview();
++
++      if (!igm.was_paused)
++         command_event(CMD_EVENT_UNPAUSE, NULL);
++
++      /* Prevent the close button from bleeding into the game */
++      menu_state_get_ptr()->input_driver_flushing_input = 2;
++   }
++   else
++   {
++      /* Open IGM */
++      runloop_state_t *runloop_st = runloop_state_get_ptr();
++      igm.was_paused     = (runloop_st->flags & RUNLOOP_FLAG_PAUSED) != 0;
++      igm.active         = true;
++      igm.selected       = 0;
++      igm.pending_action = IGM_NO_PENDING;
++      igm.deferred_close = IGM_NO_PENDING;
++
++      /* Flush button state so we don't act on the toggle press itself */
++      igm.prev_buttons   = 0xFFFF;
++
++      /* Pause the core if it isn't already */
++      if (!igm.was_paused)
++         command_event(CMD_EVENT_PAUSE, NULL);
++   }
++}
++
++bool spruce_igm_is_active(void)
++{
++   return igm.active;
++}
++
++/* ── Deferred action processing (called from runloop) ──────── */
++
++void spruce_igm_process_pending(void)
++{
++   int action;
++
++   if (igm.pending_action == IGM_NO_PENDING)
++      return;
++
++   action             = igm.pending_action;
++   igm.pending_action = IGM_NO_PENDING;
++   igm.active         = false;
++   igm_unload_preview();
++
++   /* Unpause before executing the action.
++    * We unpause for all actions (including RA menu)
++    * so the target system starts from a clean state. */
++   if (!igm.was_paused)
++      command_event(CMD_EVENT_UNPAUSE, NULL);
++
++   /* Prevent the action button from bleeding into the game */
++   menu_state_get_ptr()->input_driver_flushing_input = 2;
++
++   switch (action)
++   {
++      case IGM_RESUME:
++         /* Already unpaused above */
++         break;
++      case IGM_LOAD_STATE:
++         command_event(CMD_EVENT_LOAD_STATE, NULL);
++         /* CMD_EVENT_LOAD_STATE sets run_frames_and_pause when
++          * called while paused, which would re-pause after one
++          * frame.  We already unpaused, but cancel it anyway
++          * in case of a race. */
++         runloop_state_get_ptr()->run_frames_and_pause = 0;
++         break;
++      case IGM_RESET:
++         command_event(CMD_EVENT_RESET, NULL);
++         break;
++      case IGM_RETROARCH:
++         command_event(CMD_EVENT_MENU_TOGGLE, NULL);
++         break;
++      case IGM_EXIT:
++         command_event(CMD_EVENT_QUIT, NULL);
++         break;
++   }
++}
++
++/* ── Input handling (called every frame while active) ──────── */
++
++static void igm_handle_input(void)
++{
++   uint16_t cur  = igm_read_buttons();
++   uint16_t prev = igm.prev_buttons;
++   igm.prev_buttons = cur;
++
++   /* Wait for A/B release before executing a close action.
++    * This prevents the button press from bleeding into the game. */
++   if (igm.deferred_close != IGM_NO_PENDING)
++   {
++      if (!(cur & ((1 << RETRO_DEVICE_ID_JOYPAD_A)
++                  | (1 << RETRO_DEVICE_ID_JOYPAD_B))))
++      {
++         igm.pending_action = igm.deferred_close;
++         igm.deferred_close = IGM_NO_PENDING;
++      }
++      return;
++   }
++
++   /* D-pad up */
++   if (IGM_PRESSED(cur, prev, RETRO_DEVICE_ID_JOYPAD_UP))
++   {
++      igm.selected--;
++      if (igm.selected < 0)
++         igm.selected = IGM_ITEM_COUNT - 1;
++   }
++
++   /* D-pad down */
++   if (IGM_PRESSED(cur, prev, RETRO_DEVICE_ID_JOYPAD_DOWN))
++   {
++      igm.selected++;
++      if (igm.selected >= IGM_ITEM_COUNT)
++         igm.selected = 0;
++   }
++
++   /* D-pad left / right — change state slot (on save/load rows) */
++   if (igm.selected == IGM_SAVE_STATE || igm.selected == IGM_LOAD_STATE)
++   {
++      if (IGM_PRESSED(cur, prev, RETRO_DEVICE_ID_JOYPAD_LEFT))
++         command_event(CMD_EVENT_SAVE_STATE_DECREMENT, NULL);
++      if (IGM_PRESSED(cur, prev, RETRO_DEVICE_ID_JOYPAD_RIGHT))
++         command_event(CMD_EVENT_SAVE_STATE_INCREMENT, NULL);
++   }
++
++   /* B button — close (resume), deferred until released */
++   if (IGM_PRESSED(cur, prev, RETRO_DEVICE_ID_JOYPAD_B))
++   {
++      igm.deferred_close = IGM_RESUME;
++      return;
++   }
++
++   /* A button — activate selected item */
++   if (IGM_PRESSED(cur, prev, RETRO_DEVICE_ID_JOYPAD_A))
++   {
++      switch (igm.selected)
++      {
++         case IGM_SAVE_STATE:
++            /* Save is safe from render context — stays in IGM */
++            command_event(CMD_EVENT_SAVE_STATE, NULL);
++            /* Force preview reload so it picks up the new screenshot */
++            igm.preview_slot = IGM_PREVIEW_NO_SLOT;
++            break;
++         default:
++            /* All other actions wait for button release, then
++             * get picked up by process_pending next frame. */
++            igm.deferred_close = igm.selected;
++            return;
++      }
++   }
++}
++
++/* ── Rendering ─────────────────────────────────────────────── */
++
++void spruce_igm_frame(
++      gfx_display_t *p_disp,
++      void *userdata,
++      unsigned video_width,
++      unsigned video_height)
++{
++   int i;
++   char slot_buf[64];
++   settings_t *settings;
++   static float color_white[16] = {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
++
++   if (!igm.active)
++      return;
++
++   /* Lazy-load fonts on first render */
++   if (!igm.font)
++   {
++      igm.font       = gfx_display_font_file(p_disp, NULL,
++                           video_height / 20.0f, false);
++      igm.font_small = gfx_display_font_file(p_disp, NULL,
++                           video_height / 28.0f, false);
++   }
++   if (!igm.font)
++      return;
++
++   /* Handle input — may set pending_action for deferred execution */
++   igm_handle_input();
++
++   /* Update preview texture if slot changed or selection moved */
++   igm_update_preview();
++
++   settings = config_get_ptr();
++
++   /* ── Layout constants (proportional to screen) ─────── */
++   int margin  = video_width * 2 / 100;              /* 2% margin from edges */
++   int panel_w = video_width  * 38 / 100;             /* ~38% of screen width  */
++   int item_h  = video_height * 8  / 100;             /* ~8% per row           */
++   int panel_h = item_h * IGM_ITEM_COUNT + item_h;    /* items + title */
++   int panel_x = margin;                              /* left-aligned */
++   int panel_y = (video_height - panel_h) / 2;
++   int title_h = item_h;
++   int text_cx = panel_x + panel_w / 2;               /* text center x */
++
++   /* ── Full-screen dim ───────────────────────────────── */
++   gfx_display_draw_quad(p_disp, userdata,
++         video_width, video_height,
++         0, 0, video_width, video_height,
++         video_width, video_height,
++         color_dim_bg, NULL);
++
++   /* ── Panel background ──────────────────────────────── */
++   gfx_display_draw_quad(p_disp, userdata,
++         video_width, video_height,
++         panel_x, panel_y, panel_w, panel_h,
++         video_width, video_height,
++         color_panel, NULL);
++
++   /* ── Title bar ─────────────────────────────────────── */
++   gfx_display_draw_quad(p_disp, userdata,
++         video_width, video_height,
++         panel_x, panel_y, panel_w, title_h,
++         video_width, video_height,
++         color_title_bg, NULL);
++
++   if (igm.font_small)
++      gfx_display_draw_text(igm.font_small, "spruceOS Menu",
++            (float)text_cx,
++            (float)(panel_y + title_h * 0.68f),
++            video_width, video_height,
++            TEXT_COLOR_NORMAL,
++            TEXT_ALIGN_CENTER,
++            1.0f, false, 0.0f, false);
++
++   /* ── Menu items ────────────────────────────────────── */
++   for (i = 0; i < IGM_ITEM_COUNT; i++)
++   {
++      int iy        = panel_y + title_h + i * item_h;
++      bool selected = (i == igm.selected);
++
++      /* Divider line */
++      if (i > 0)
++         gfx_display_draw_quad(p_disp, userdata,
++               video_width, video_height,
++               panel_x + panel_w / 20, iy,
++               panel_w - panel_w / 10, 1,
++               video_width, video_height,
++               color_divider, NULL);
++
++      /* Selection highlight */
++      if (selected)
++         gfx_display_draw_quad(p_disp, userdata,
++               video_width, video_height,
++               panel_x, iy, panel_w, item_h,
++               video_width, video_height,
++               color_selected, NULL);
++
++      /* Label text (save/load rows include slot number) */
++      {
++         uint32_t text_col;
++         const char *label;
++
++         if (i == IGM_SAVE_STATE || i == IGM_LOAD_STATE)
++         {
++            int slot = settings->ints.state_slot;
++            if (slot < 0)
++               snprintf(slot_buf, sizeof(slot_buf), "%s Auto",
++                     igm_labels[i]);
++            else
++               snprintf(slot_buf, sizeof(slot_buf), "%s Slot %d",
++                     igm_labels[i], slot);
++            label = slot_buf;
++         }
++         else
++            label = igm_labels[i];
++
++         text_col = selected ? TEXT_COLOR_SELECTED : TEXT_COLOR_NORMAL;
++
++         gfx_display_draw_text(igm.font, label,
++               (float)text_cx,
++               (float)(iy + item_h * 0.68f),
++               video_width, video_height,
++               text_col,
++               TEXT_ALIGN_CENTER,
++               1.0f, false, 0.0f, false);
++      }
++
++      /* Arrows for Save/Load rows */
++      if (i == IGM_SAVE_STATE || i == IGM_LOAD_STATE)
++      {
++         gfx_display_draw_text(igm.font, "<",
++               (float)(panel_x + panel_w / 10),
++               (float)(iy + item_h * 0.68f),
++               video_width, video_height,
++               selected ? TEXT_COLOR_SELECTED : TEXT_COLOR_NORMAL,
++               TEXT_ALIGN_CENTER,
++               1.0f, false, 0.0f, false);
++
++         gfx_display_draw_text(igm.font, ">",
++               (float)(panel_x + panel_w - panel_w / 10),
++               (float)(iy + item_h * 0.68f),
++               video_width, video_height,
++               selected ? TEXT_COLOR_SELECTED : TEXT_COLOR_NORMAL,
++               TEXT_ALIGN_CENTER,
++               1.0f, false, 0.0f, false);
++      }
++   }
++
++   /* ── Save state preview (right of panel) ───────────── */
++   if (igm.preview_texture
++         && (igm.selected == IGM_SAVE_STATE
++             || igm.selected == IGM_LOAD_STATE))
++   {
++      int preview_area_x = panel_x + panel_w + margin;
++      int preview_area_w = video_width - preview_area_x - margin;
++      int preview_area_h = panel_h;
++
++      if (preview_area_w > 0
++            && igm.preview_tex_w > 0
++            && igm.preview_tex_h > 0)
++      {
++         float scale_w = (float)preview_area_w / (float)igm.preview_tex_w;
++         float scale_h = (float)preview_area_h / (float)igm.preview_tex_h;
++         float scale   = (scale_w < scale_h) ? scale_w : scale_h;
++
++         unsigned draw_w = (unsigned)(igm.preview_tex_w * scale);
++         unsigned draw_h = (unsigned)(igm.preview_tex_h * scale);
++
++         float draw_x = (float)(preview_area_x
++               + (preview_area_w - (int)draw_w) / 2);
++         float draw_y = (float)(panel_y
++               + (panel_h - (int)draw_h) / 2);
++
++         {
++            gfx_display_ctx_driver_t *dispctx = p_disp->dispctx;
++            if (dispctx && dispctx->blend_begin)
++               dispctx->blend_begin(userdata);
++            gfx_widgets_draw_icon(userdata, p_disp,
++                  video_width, video_height,
++                  draw_w, draw_h,
++                  igm.preview_texture,
++                  draw_x, draw_y,
++                  0.0f, 1.0f, 0.0f,
++                  color_white);
++            if (dispctx && dispctx->blend_end)
++               dispctx->blend_end(userdata);
++         }
++      }
++   }
++
++}
+diff --git a/spruce_igm.h b/spruce_igm.h
+new file mode 100644
+index 0000000..4613e26
+--- /dev/null
++++ b/spruce_igm.h
+@@ -0,0 +1,18 @@
++#ifndef SPRUCE_IGM_H
++#define SPRUCE_IGM_H
++
++#include <boolean.h>
++
++#include "gfx/gfx_display.h"
++
++bool spruce_igm_is_enabled(void);
++void spruce_igm_toggle(void);
++bool spruce_igm_is_active(void);
++void spruce_igm_process_pending(void);
++void spruce_igm_frame(
++      gfx_display_t *p_disp,
++      void *userdata,
++      unsigned video_width,
++      unsigned video_height);
++
++#endif /* SPRUCE_IGM_H */
