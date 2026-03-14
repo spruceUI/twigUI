@@ -19,7 +19,7 @@ tmp/release/Emu/DC/lib-TrimUI/
 tmp/release/Emu/DC/lib64/!(liblua5*|libminiupnpc*|libzip*)
 tmp/release/Emu/MEDIA/bin32/
 tmp/release/Emu/MEDIA/lib32/
-tmp/release/Emu/MEDIA/lib64/*
+tmp/release/Emu/MEDIA/lib64/!(libpostproc.so.57)
 tmp/release/Emu/N64/mupen64plus/lib[!mu]*.so*
 tmp/release/Emu/NDS/drastic32
 tmp/release/Emu/NDS/cheats/

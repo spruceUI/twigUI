@@ -1,4 +1,4 @@
-tmp/
+/tmp/
 images/
 twig*.7z
 twig*.zip
