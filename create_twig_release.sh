@@ -42,6 +42,11 @@ for f in $(cat delete.txt) ; do
   rm -r "$f"
 done
 
+# change some config defaults
+jaq -i '.menuOptions."System Settings".useZRAM.selected = "True"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
+jaq -i '.menuOptions."Battery Settings".idlemonChargingInMenu.selected = "30s"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
+
+# Remove dev flag for releases
 if [ "$1" = "release" ]; then
   rm "${TMP_DIR}${REL_DIR}spruce/flags/developer_mode"
 fi
