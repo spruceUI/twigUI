@@ -1,0 +1,4 @@
+https://raw.githubusercontent.com/spruceUI/PyUI-Themes/main/PackedThemes/ALEKFULL_NX_ES.7z
+https://raw.githubusercontent.com/spruceUI/PyUI-Themes/main/PackedThemes/ART_BOOK_NEXT.7z
+https://raw.githubusercontent.com/spruceUI/PyUI-Themes/main/PackedThemes/MINIMAL.7z
+https://raw.githubusercontent.com/spruceUI/PyUI-Themes/main/PackedThemes/M.7z

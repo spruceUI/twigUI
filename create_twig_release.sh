@@ -19,6 +19,9 @@ if [ "$CURRENT_COMMIT" != "$MAINLINE_COMMIT" ]; then
 
   git clone --revision=$MAINLINE_COMMIT --depth=1 https://github.com/spruceUI/spruceOS.git
   git clone --depth=1 https://github.com/spruceUI/pixel2-base.git
+
+  wget -nc -P spruceOS/Themes/ -i ../themes.txt
+
   echo $MAINLINE_COMMIT > ../current_commit.txt
 fi
 
