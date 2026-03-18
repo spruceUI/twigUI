@@ -1,9 +1,11 @@
 tmp/release/App/-FirmwareUpdate-/
+tmp/release/App/adbd/
 tmp/release/App/BootLogo/
 tmp/release/App/FileManagement/lib-*
 tmp/release/App/FileManagement/DinguxCommander[!Fl][!Pi]*
 tmp/release/App/FileManagement/DinguxCommanderMiyooMini
 tmp/release/App/fn_editor/
+tmp/release/App/Gallery/lib32
 tmp/release/App/Moonlight/
 tmp/release/App/PixelReader/libs/
 tmp/release/App/PixelReader/libs32/
@@ -33,9 +35,14 @@ tmp/release/Emu/NDS/libs/
 tmp/release/Emu/NDS/libs_MiyooMini/
 tmp/release/Emu/NDS/res/
 tmp/release/Emu/NDS/resources/bg_752/
+tmp/release/Emu/NDS/resources/bg/720x480/
+tmp/release/Emu/NDS/resources/bg/720x720/
+tmp/release/Emu/NDS/resources/bg/1024x768/
+tmp/release/Emu/NDS/resources/bg/1280x720/
 tmp/release/Emu/OPENBOR/lib/
 tmp/release/Emu/OPENBOR/OpenBOR_[!Tr]*
 tmp/release/Emu/PICO8/lib-*
+tmp/release/Emu/PSP/assets/debugger/
 tmp/release/Emu/PSP/libstdc++.so.6
 tmp/release/Emu/PSP/*(joy*|miyoo282_xpad_inputd)
 tmp/release/Emu/PSP/PPSSPPSDL_[!Pi]*
@@ -45,8 +52,7 @@ tmp/release/Emu/SATURN/.emulationstation
 tmp/release/Emu/SATURN/input.cfg
 tmp/release/Emu/SATURN/yabasanshiro.trimui
 tmp/release/Emu/SCUMMVM/lib/!(liba52*|libbsd*|libfaad*|libgif*|libmad*|libmikmod*|libsndio*|libspeechd*)
-tmp/release/miyoo/
-tmp/release/miyoo355/
+tmp/release/miyoo*/
 tmp/release/RetroArch/.retroarch/cores/
 tmp/release/RetroArch/.retroarch/cores64/scummvm_libretro.[!zip]*
 tmp/release/RetroArch/.retroarch/cores64/81_libretro.so
@@ -66,9 +72,8 @@ tmp/release/RetroArch/.retroarch/cores64/uzem_libretro.so
 tmp/release/RetroArch/.retroarch/cores64/vemulator_libretro.so
 tmp/release/RetroArch/.retroarch/cores64/x1_libretro.so
 tmp/release/RetroArch/joypad
-tmp/release/RetroArch/ra*
-tmp/release/RetroArch/RA32.A30
-tmp/release/RetroArch/retroarch.[!Pi]*
+tmp/release/RetroArch/ra32.*
+tmp/release/RetroArch/ra64.universal
 tmp/release/Roms/A30PORTS/
 tmp/release/Saves/flip/home/*
 tmp/release/spruce/archives/staging/overlays_1024x768.7z
@@ -80,6 +85,8 @@ tmp/release/spruce/a30/
 tmp/release/spruce/brick/
 tmp/release/spruce/FIRMWARE_UPDATE/
 tmp/release/spruce/flip/
+tmp/release/spruce/rg3*/
+tmp/release/spruce/rg2*/
 tmp/release/spruce/miyoomini/
 tmp/release/spruce/smartpro/
 tmp/release/spruce/smartpros/

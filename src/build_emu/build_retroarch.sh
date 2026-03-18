@@ -34,3 +34,4 @@ git apply ../ra_patches/*
 make -j$(( $(nproc) - 1 ))
 
 strip retroarch
+mv retroarch ra64.pixel2

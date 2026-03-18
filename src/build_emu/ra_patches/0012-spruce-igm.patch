@@ -129,7 +129,7 @@ new file mode 100644
 index 0000000..0000000
 --- /dev/null
 +++ b/spruce_igm.c
-@@ -0,0 +1,523 @@
+@@ -0,0 +1,534 @@
 +/*
 + * Spruce IGM - Simple in-game menu for spruceOS handhelds
 + *
@@ -184,17 +184,18 @@ index 0000000..0000000
 +   "Exit Game"
 +};
 +
-+/* ── Gruvbox-inspired colours ──────────────────────────────── */
++/* ── Colours — matched to spruceOS theme ───────────────────── */
 +
-+static float color_dim_bg[16]     = COLOR_HEX_TO_FLOAT(0x000000, 0.62f);
-+static float color_panel[16]      = COLOR_HEX_TO_FLOAT(0x1d2021, 0.95f);
-+static float color_title_bg[16]   = COLOR_HEX_TO_FLOAT(0x3c3836, 1.0f);
-+static float color_selected[16]   = COLOR_HEX_TO_FLOAT(0xd65d0e, 0.35f);
-+static float color_divider[16]    = COLOR_HEX_TO_FLOAT(0x504945, 0.50f);
++static float color_dim_bg[16]     = COLOR_HEX_TO_FLOAT(0x000000, 0.85f);
++static float color_selected[16]   = COLOR_HEX_TO_FLOAT(0xC9A227, 0.18f);
++static float color_accent[16]     = COLOR_HEX_TO_FLOAT(0xC9A227, 0.85f);
++static float color_title_line[16] = COLOR_HEX_TO_FLOAT(0x665C54, 0.40f);
 +
 +/* RRGGBBAA format for gfx_display_draw_text */
-+#define TEXT_COLOR_NORMAL   0xEBDBB2FFu   /* #EBDBB2 */
-+#define TEXT_COLOR_SELECTED 0xFBF1C7FFu   /* #FBF1C7 */
++#define TEXT_COLOR_NORMAL   0xBDAD91FFu   /* warm gray       */
++#define TEXT_COLOR_SELECTED 0xD5C4A1FFu   /* warm cream      */
++#define TEXT_COLOR_TITLE    0x689D6AFFu   /* spruce green    */
++#define TEXT_COLOR_SHADOW   0x000000C0u   /* black, 75%      */
 +
 +#define IGM_NO_PENDING      -1
 +#define IGM_PREVIEW_NO_SLOT  -999
@@ -236,6 +237,22 @@ index 0000000..0000000
 +/* Return buttons that just went from released → pressed */
 +#define IGM_PRESSED(cur, prev, btn) \
 +   (((cur) & (1 << (btn))) && !((prev) & (1 << (btn))))
++
++/* Draw text with a dark shadow for readability over any background */
++static void igm_draw_text(font_data_t *font, const char *text,
++      float x, float y,
++      unsigned vw, unsigned vh,
++      uint32_t color, enum text_alignment align)
++{
++   gfx_display_draw_text(font, text,
++         x + 2.0f, y + 2.0f, vw, vh,
++         TEXT_COLOR_SHADOW, align,
++         1.0f, false, 0.0f, false);
++   gfx_display_draw_text(font, text,
++         x, y, vw, vh,
++         color, align,
++         1.0f, false, 0.0f, false);
++}
 +
 +/* ── Preview texture management ────────────────────────────── */
 +
@@ -480,10 +497,15 @@ index 0000000..0000000
 +   /* Lazy-load fonts on first render */
 +   if (!igm.font)
 +   {
-+      igm.font       = gfx_display_font_file(p_disp, NULL,
-+                           video_height / 20.0f, false);
-+      igm.font_small = gfx_display_font_file(p_disp, NULL,
-+                           video_height / 28.0f, false);
++      {
++         const char *font_path = "/mnt/SDCARD/Themes/SPRUCE/nunwen.ttf";
++         if (access(font_path, F_OK) != 0)
++            font_path = "/mnt/SDCARD/App/PixelReader/resources/fonts/nunwen.ttf";
++         igm.font       = gfx_display_font_file(p_disp, font_path,
++                              (video_height / 20.0f) * 1.2f, false);
++         igm.font_small = gfx_display_font_file(p_disp, font_path,
++                              (video_height / 28.0f) * 1.2f, false);
++      }
 +   }
 +   if (!igm.font)
 +      return;
@@ -497,14 +519,16 @@ index 0000000..0000000
 +   settings = config_get_ptr();
 +
 +   /* ── Layout constants (proportional to screen) ─────── */
-+   int margin  = video_width * 2 / 100;              /* 2% margin from edges */
-+   int panel_w = video_width  * 38 / 100;             /* ~38% of screen width  */
-+   int item_h  = video_height * 8  / 100;             /* ~8% per row           */
-+   int panel_h = item_h * IGM_ITEM_COUNT + item_h;    /* items + title */
-+   int panel_x = margin;                              /* left-aligned */
-+   int panel_y = (video_height - panel_h) / 2;
-+   int title_h = item_h;
-+   int text_cx = panel_x + panel_w / 2;               /* text center x */
++   int margin     = (video_width * 2 / 100) * 1.2;
++   int panel_w    = (video_width  * 38 / 100) * 1.2;
++   int item_h     = (video_height * 8  / 100) * 1.2;
++   int title_h    = item_h;
++   int panel_h    = item_h * IGM_ITEM_COUNT + title_h;
++   int panel_x    = margin;
++   int panel_y    = (video_height - panel_h) / 2;
++   int text_cx    = panel_x + panel_w / 2;
++   int accent_w   = panel_w / 80;
++   if (accent_w < 2) accent_w = 2;
 +
 +   /* ── Full-screen dim ───────────────────────────────── */
 +   gfx_display_draw_quad(p_disp, userdata,
@@ -513,28 +537,21 @@ index 0000000..0000000
 +         video_width, video_height,
 +         color_dim_bg, NULL);
 +
-+   /* ── Panel background ──────────────────────────────── */
-+   gfx_display_draw_quad(p_disp, userdata,
-+         video_width, video_height,
-+         panel_x, panel_y, panel_w, panel_h,
-+         video_width, video_height,
-+         color_panel, NULL);
-+
-+   /* ── Title bar ─────────────────────────────────────── */
-+   gfx_display_draw_quad(p_disp, userdata,
-+         video_width, video_height,
-+         panel_x, panel_y, panel_w, title_h,
-+         video_width, video_height,
-+         color_title_bg, NULL);
-+
++   /* ── Title ─────────────────────────────────────────── */
 +   if (igm.font_small)
-+      gfx_display_draw_text(igm.font_small, "spruceOS Menu",
++      igm_draw_text(igm.font_small, "spruceOS Menu",
 +            (float)text_cx,
 +            (float)(panel_y + title_h * 0.68f),
 +            video_width, video_height,
-+            TEXT_COLOR_NORMAL,
-+            TEXT_ALIGN_CENTER,
-+            1.0f, false, 0.0f, false);
++            TEXT_COLOR_TITLE, TEXT_ALIGN_CENTER);
++
++   /* Thin line under title */
++   gfx_display_draw_quad(p_disp, userdata,
++         video_width, video_height,
++         panel_x + panel_w / 10, panel_y + title_h - 1,
++         panel_w - panel_w / 5, 1,
++         video_width, video_height,
++         color_title_line, NULL);
 +
 +   /* ── Menu items ────────────────────────────────────── */
 +   for (i = 0; i < IGM_ITEM_COUNT; i++)
@@ -542,22 +559,20 @@ index 0000000..0000000
 +      int iy        = panel_y + title_h + i * item_h;
 +      bool selected = (i == igm.selected);
 +
-+      /* Divider line */
-+      if (i > 0)
-+         gfx_display_draw_quad(p_disp, userdata,
-+               video_width, video_height,
-+               panel_x + panel_w / 20, iy,
-+               panel_w - panel_w / 10, 1,
-+               video_width, video_height,
-+               color_divider, NULL);
-+
-+      /* Selection highlight */
++      /* Selection: subtle highlight + left accent bar */
 +      if (selected)
++      {
 +         gfx_display_draw_quad(p_disp, userdata,
 +               video_width, video_height,
 +               panel_x, iy, panel_w, item_h,
 +               video_width, video_height,
 +               color_selected, NULL);
++         gfx_display_draw_quad(p_disp, userdata,
++               video_width, video_height,
++               panel_x, iy, accent_w, item_h,
++               video_width, video_height,
++               color_accent, NULL);
++      }
 +
 +      /* Label text (save/load rows include slot number) */
 +      {
@@ -580,33 +595,29 @@ index 0000000..0000000
 +
 +         text_col = selected ? TEXT_COLOR_SELECTED : TEXT_COLOR_NORMAL;
 +
-+         gfx_display_draw_text(igm.font, label,
++         igm_draw_text(igm.font, label,
 +               (float)text_cx,
 +               (float)(iy + item_h * 0.68f),
 +               video_width, video_height,
-+               text_col,
-+               TEXT_ALIGN_CENTER,
-+               1.0f, false, 0.0f, false);
++               text_col, TEXT_ALIGN_CENTER);
 +      }
 +
 +      /* Arrows for Save/Load rows */
 +      if (i == IGM_SAVE_STATE || i == IGM_LOAD_STATE)
 +      {
-+         gfx_display_draw_text(igm.font, "<",
++         igm_draw_text(igm.font, "<",
 +               (float)(panel_x + panel_w / 10),
 +               (float)(iy + item_h * 0.68f),
 +               video_width, video_height,
 +               selected ? TEXT_COLOR_SELECTED : TEXT_COLOR_NORMAL,
-+               TEXT_ALIGN_CENTER,
-+               1.0f, false, 0.0f, false);
++               TEXT_ALIGN_CENTER);
 +
-+         gfx_display_draw_text(igm.font, ">",
++         igm_draw_text(igm.font, ">",
 +               (float)(panel_x + panel_w - panel_w / 10),
 +               (float)(iy + item_h * 0.68f),
 +               video_width, video_height,
 +               selected ? TEXT_COLOR_SELECTED : TEXT_COLOR_NORMAL,
-+               TEXT_ALIGN_CENTER,
-+               1.0f, false, 0.0f, false);
++               TEXT_ALIGN_CENTER);
 +      }
 +   }
 +
