@@ -79,7 +79,7 @@ tmp/release/Saves/flip/home/*
 tmp/release/spruce/archives/staging/overlays_1024x768.7z
 tmp/release/spruce/bin/*[!Syncthing]*
 tmp/release/spruce/bin/Syncthing/bin/
-tmp/release/spruce/bin64/*(7zr|busybox|curl|evtest|fb*|gesftpserver|gpiowait|gptokeyb|htop|iperf*|joypad|jq|kmsgrab)
+tmp/release/spruce/bin64/*(7zr|busybox|curl|evtest|fb*|gesftpserver|gpiowait|htop|iperf*|joypad|jq|kmsgrab)
 tmp/release/spruce/bin64/*(ldd|mkfs.fat|nsupdate|*nano|rsync|scp|sdl2imgshow|setsharedm*|ssh-*|tcpdump|wget|xz|zip*)
 tmp/release/spruce/a30/
 tmp/release/spruce/brick/
