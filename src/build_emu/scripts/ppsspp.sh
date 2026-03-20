@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd ../ppsspp
-git checkout eb859735feddf88dbe651763f366a7705612113a
+git checkout d357e6a32934800d3d80b49f910a603e1b069751
 git submodule update --recursive
 
 git apply ../emu_patches/ppsspp*
