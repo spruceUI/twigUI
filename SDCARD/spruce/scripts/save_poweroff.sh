@@ -302,10 +302,12 @@ fi
 display_appropriate_icon_and_message
 dim_screen_and_do_syncthing_check
 clean_up_flags
+alsactl store 2>/dev/null
+kill_remaining_background_processes
 
 # Systemd handles graceful shutdown on the pixel2
 if device_system_handles_sdcard_unmount; then
-    kill_remaining_background_processes
+
     if [ "$s2_arg" = "--reboot" ]; then
         device_run_reboot_cmd
     else
@@ -314,10 +316,6 @@ if device_system_handles_sdcard_unmount; then
 
     exit 0
 fi
-
-alsactl store
-
-kill_remaining_background_processes
 
 unmount_all
 sleep 0.1
