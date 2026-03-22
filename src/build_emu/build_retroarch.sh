@@ -6,6 +6,8 @@ cd RetroArch
 git checkout e5eff6db27cd37c3c318741ee8bb9a3b8b60ec62
 git apply ../ra_patches/*
 
+
+CFLAGS="-Ofast -march=armv8-a -mtune=cortex-a35 -fomit-frame-pointer -DNDEBUG" \
 ./configure --disable-qt \
             --disable-discord \
             --disable-neon \
