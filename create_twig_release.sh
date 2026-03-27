@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MAINLINE_COMMIT="b013a69bd5cdb4ab3604118d55b6921614278ec9"
+MAINLINE_COMMIT="217cc5347d14c427b16b3326314afa145a2bce3a"
 CURRENT_COMMIT=$(cat current_commit.txt)
 
 TMP_DIR="tmp/"
@@ -48,16 +48,12 @@ done
 # change some config defaults
 jaq -i '.menuOptions."System Settings".useZRAM.selected = "True"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
 jaq -i '.menuOptions."Battery Settings".idlemonChargingInMenu.selected = "30s"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
+jaq -i '.menuOptions."Battery Settings".shutdownFromSleep.selected = "Off"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
 
 # Remove dev flag for releases
 if [ "$1" = "release" ]; then
   rm "${TMP_DIR}${REL_DIR}spruce/flags/developer_mode"
 fi
-
-# Extract scummvm
-SCVM_PATH="${TMP_DIR}${REL_DIR}RetroArch/.retroarch/cores64/"
-unzip -d $SCVM_PATH "${SCVM_PATH}scummvm_libretro.zip"
-rm "${SCVM_PATH}scummvm_libretro.zip"
 
 # Make archive and clean up
 7z a -t7z -mx=7 -mf- "${OUT_FILE}_update.7z" ./"${TMP_DIR}${REL_DIR}"*

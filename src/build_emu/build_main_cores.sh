@@ -64,7 +64,6 @@ cores=(
   "vectrex"
   "vice"
   "yabasanshiro"
-  "scummvm-libretro"
 )
 
 git clone https://github.com/christianhaitian/rk3326_core_builds.git
