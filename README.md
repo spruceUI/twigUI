@@ -1,5 +1,14 @@
 # twigUI
-SpruceOS for the GKD Pixel 2
+spruceOS for the GKD Pixel 2.
+
+In addition to all spruceOS features, there's a handful of changes for this device:
+
+- MPV as a video player option
+- Extra flycast versions
+- D-pad to analog toggle in PPSSPP and ScummVM (L2 + R2)
+- Option to turn off the screen while charging (enabled by default)
+- zRam enabled by default
+- Shutdown from sleep disabled by default (still can enable it)
 
 ## Installation
 
