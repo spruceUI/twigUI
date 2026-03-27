@@ -20,6 +20,9 @@ The installation process will wipe everything in your microSD card, make backups
 - It downloads and flashes the latest TwigUI release and it available for Windows, Mac and Linux!
 - Just be sure to select TwigUI from the available options.
 
+> [!CAUTION]
+> After using the installer the first boot process needs to happen before setting up games and such.
+
 <img width="683" height="456" alt="twig" src="https://github.com/user-attachments/assets/afb2c699-11f1-4d10-ac5a-91e76718fd32" />
 
 ### Manual Installation
