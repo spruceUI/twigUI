@@ -3,6 +3,7 @@ spruceOS for the GKD Pixel 2.
 
 In addition to all spruceOS features, there's a handful of changes for this device:
 
+- Shortcuts hotkey is the menu button instead of select (can be changed in the settings)
 - MPV as a video player option
 - Extra flycast versions
 - D-pad to analog toggle in PPSSPP and ScummVM (L2 + R2)
