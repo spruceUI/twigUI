@@ -16,6 +16,7 @@ tmp/release/App/PortMaster/config.py
 tmp/release/App/PyUI/dll/
 tmp/release/Emu/A30PORTS/
 tmp/release/Emu/AMIGA/*.so*
+tmp/release/Emu/ARCADE/lib/
 tmp/release/Emu/EASYRPG/lib-*
 tmp/release/Emu/DC/lib-TrimUI/
 tmp/release/Emu/DC/lib64/!(liblua5*|libminiupnpc*|libzip*)
