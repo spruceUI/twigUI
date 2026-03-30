@@ -1,13 +1,13 @@
 #!/bin/bash
 
-git clone https://github.com/libretro/RetroArch.git
+# git clone https://github.com/libretro/RetroArch.git
 
 cd RetroArch
-git checkout e5eff6db27cd37c3c318741ee8bb9a3b8b60ec62
-git apply ../ra_patches/*
+# git checkout e5eff6db27cd37c3c318741ee8bb9a3b8b60ec62
+# git apply ../ra_patches/*
 
 
-CFLAGS="-Ofast -march=armv8-a -mtune=cortex-a35 -fomit-frame-pointer -DNDEBUG" \
+CFLAGS="-Ofast -march=armv8-a -mtune=cortex-a35 -fomit-frame-pointer -DNDEBUG -DHAVE_FILTERS_BUILTIN" \
 ./configure --disable-qt \
             --disable-discord \
             --disable-neon \
@@ -33,7 +33,23 @@ CFLAGS="-Ofast -march=armv8-a -mtune=cortex-a35 -fomit-frame-pointer -DNDEBUG" \
             --enable-opengles3_2 \
             --enable-opengl \
 
-make -j$(( $(nproc) - 1 ))
-
+make HAVE_STATIC_VIDEO_FILTERS=1 HAVE_STATIC_AUDIO_FILTERS=1 -j$(( $(nproc) - 1 ))
 strip retroarch
-mv retroarch ra64.pixel2
+
+mkdir build/
+mv retroarch build/ra64.pixel2
+
+make -C gfx/video_filters extra_flags="$CFLAGS"
+make -C libretro-common/audio/dsp_filters extra_flags="$CFLAGS"
+
+strip gfx/video_filters/*.so
+strip libretro-common/audio/dsp_filters/*.so
+
+mkdir -p build/audio/
+mkdir -p build/video/
+
+cp gfx/video_filters/*.so build/video/
+cp gfx/video_filters/*.filt build/video/
+
+cp libretro-common/audio/dsp_filters/*.so build/audio/
+cp libretro-common/audio/dsp_filters/*.dsp build/audio/
