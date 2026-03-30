@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MAINLINE_COMMIT="217cc5347d14c427b16b3326314afa145a2bce3a"
+MAINLINE_COMMIT="df151c58096493963fb83ceeb5085dbc5cd5828e"
 CURRENT_COMMIT=$(cat current_commit.txt)
 
 TMP_DIR="tmp/"
@@ -20,6 +20,8 @@ if [ "$CURRENT_COMMIT" != "$MAINLINE_COMMIT" ]; then
   git clone --revision=$MAINLINE_COMMIT --depth=1 https://github.com/spruceUI/spruceOS.git
   git clone --depth=1 https://github.com/spruceUI/pixel2-base.git
 
+  # Download missing files
+  wget -nc -O spruceOS/RetroArch/ra64.pixel2 https://github.com/spruceUI/RA/releases/download/latest/ra64.pixel2
   wget -nc -P spruceOS/Themes/ -i ../themes.txt
 
   echo $MAINLINE_COMMIT > ../current_commit.txt

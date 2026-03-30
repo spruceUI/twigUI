@@ -19,10 +19,6 @@ docker-compose run --rm rk-builder-3326-64 bash
 
 #### Scripts
 
-To build Retroarch:
-
-`build_retroarch.sh`
-
 To build most of the retroarch cores (using [rk3326_core_builds](https://github.com/christianhaitian/rk3326_core_builds)) :
 
 `build_main_cores.sh`
