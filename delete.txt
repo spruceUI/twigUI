@@ -16,7 +16,6 @@ tmp/release/App/PortMaster/config.py
 tmp/release/App/PyUI/dll/
 tmp/release/Emu/A30PORTS/
 tmp/release/Emu/AMIGA/*.so*
-tmp/release/Emu/ARCADE/lib/
 tmp/release/Emu/EASYRPG/lib-*
 tmp/release/Emu/DC/lib-TrimUI/
 tmp/release/Emu/DC/lib64/!(liblua5*|libminiupnpc*|libzip*)
@@ -53,13 +52,12 @@ tmp/release/Emu/SATURN/.emulationstation
 tmp/release/Emu/SATURN/input.cfg
 tmp/release/Emu/SATURN/yabasanshiro.trimui
 tmp/release/Emu/SCUMMVM/fixjoy
-tmp/release/Emu/SCUMMVM/lib32/
+tmp/release/Emu/SCUMMVM/liba30/
+tmp/release/Emu/SCUMMVM/libmini/
 tmp/release/Emu/SCUMMVM/lib/!(liba52*|libbsd*|libfaad*|libgif*|libmad*|libmikmod*|libsndio*|libspeechd*)
 tmp/release/Emu/SCUMMVM/scummvm_a30.7z
 tmp/release/Emu/SCUMMVM/scummvm_mini.7z
-tmp/release/Emu/SCUMMVM/scummvm_mini_extra.7z
 tmp/release/Emu/SCUMMVM/scummvm_mini_plugins.7z
-tmp/release/Emu/SCUMMVM/scummvm_mini_theme.7z
 tmp/release/miyoo*/
 tmp/release/RetroArch/.config/
 tmp/release/RetroArch/.retroarch/cores/
