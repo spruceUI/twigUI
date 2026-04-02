@@ -37,8 +37,7 @@ The installation process will wipe everything in your microSD card, make backups
 
 ## Updating
 
-
-There are two ways of updating to the latest release.
+Easiest way to update is using the `Check for updates` App with a compatible USB wifi adapter. See other options below.
 
 ### EZ Updater
 
