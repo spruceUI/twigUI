@@ -11,6 +11,10 @@ In addition to all spruceOS features, there's a handful of changes for this devi
 - zRam enabled by default
 - Shutdown from sleep disabled by default (still can enable it)
 
+#### USB Wifi
+
+Only single function (no wifi+bluetooth) adapters that use the rtl8188eu chipset work, a confirmed to work adapter you can get for cheap is the TL-WN725N. Sleep disables the usb host driver so you need to restart to use wifi after using sleep.
+
 ## Installation
 
 > [!CAUTION]
