@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MAINLINE_COMMIT="d58b5114f63a36fe944bd3044cda2c2a5551cd12"
+MAINLINE_COMMIT="9f020cbd62819617387226ecf3681e8e530a1017"
 CURRENT_COMMIT=$(cat current_commit.txt)
 
 TMP_DIR="tmp/"
@@ -52,6 +52,7 @@ done
 jaq -i '.menuOptions."System Settings".useZRAM.selected = "True"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
 jaq -i '.menuOptions."Battery Settings".idlemonChargingInMenu.selected = "30s"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
 jaq -i '.menuOptions."Battery Settings".shutdownFromSleep.selected = "Off"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
+jaq -i '.menuOptions."Network Settings".syncBeforeLaunch.selected = "False"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
 
 # Remove dev flag for releases
 if [ "$1" = "release" ]; then

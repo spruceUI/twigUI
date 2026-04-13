@@ -80,8 +80,8 @@ developer_mode_task() {
         ssh_service=$(get_ssh_service_name)
 
         if [ "$samba_enabled" = "True" ] || [ "$ssh_enabled" = "True" ]; then
-            # Loop until WiFi is connected
-            while ! ifconfig wlan0 | grep -qE "inet |inet6 "; do
+            # Loop until network is connected
+            while ! network_is_connected true; do
                 sleep 0.2
             done
 
@@ -159,7 +159,8 @@ unstage_archives_wanted() {
     fi
     if [ "$DEVICE_USES_64_BIT_RA" = "true" ]; then
         unstage_archive "cores64.7z" "preCmd"
-    else
+    fi
+    if [ "$DEVICE_HAS_32_BIT_RA" = "true" ] || [ "$DEVICE_USES_64_BIT_RA" != "true" ]; then
         unstage_archive "cores32.7z" "preCmd"
     fi
 }

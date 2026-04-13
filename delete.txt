@@ -1,3 +1,4 @@
+tmp/release/To-Do.txt
 tmp/release/App/-FirmwareUpdate-/
 tmp/release/App/adbd/
 tmp/release/App/BootLogo/
@@ -16,13 +17,15 @@ tmp/release/App/PortMaster/config.py
 tmp/release/App/PyUI/dll/
 tmp/release/Emu/A30PORTS/
 tmp/release/Emu/AMIGA/*.so*
+tmp/release/Emu/ARCADE/setalpha
 tmp/release/Emu/EASYRPG/lib-*
 tmp/release/Emu/DC/lib-TrimUI/
-tmp/release/Emu/DC/lib64/!(liblua5*|libminiupnpc*|libzip*)
+tmp/release/Emu/DC/lib64/!(liblua5*|libminiupnpc*|libzip.so.4)
 tmp/release/Emu/MEDIA/bin32/
 tmp/release/Emu/MEDIA/lib32/
+tmp/release/Emu/MEDIA/gvu_lib32*/
 tmp/release/Emu/MEDIA/lib64/!(libpostproc.so.57)
-tmp/release/Emu/N64/mupen64plus/lib[!mu]*.so*
+tmp/release/Emu/N64/mupen64plus-a30/
 tmp/release/Emu/NDS/drastic32
 tmp/release/Emu/NDS/cheats/
 tmp/release/Emu/NDS/lib32_Brick/
@@ -42,9 +45,11 @@ tmp/release/Emu/NDS/resources/bg/1280x720/
 tmp/release/Emu/OPENBOR/lib/
 tmp/release/Emu/OPENBOR/OpenBOR_[!Tr]*
 tmp/release/Emu/PICO8/lib-*
+tmp/release/Emu/PS/liba30/
+tmp/release/Emu/PS/pcsx_*
 tmp/release/Emu/PSP/assets/debugger/
 tmp/release/Emu/PSP/libstdc++.so.6
-tmp/release/Emu/PSP/*(joy*|miyoo282_xpad_inputd)
+tmp/release/Emu/PSP/*(joy*|miyoo282_xpad_inputd|setalpha)
 tmp/release/Emu/PSP/PPSSPPSDL_[!Pi]*
 tmp/release/Emu/SATURN/lib64/!(libboost*|libicu*)
 tmp/release/Emu/SATURN/.yabasanshiro/backup.bin
