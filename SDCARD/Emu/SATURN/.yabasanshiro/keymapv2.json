@@ -35,6 +35,11 @@
       "type": "button",
       "value": 1
     },
+    "select": {
+      "id": 14,
+      "type": "button",
+      "value": 1
+    },
     "start": {
       "id": 9,
       "type": "button",
