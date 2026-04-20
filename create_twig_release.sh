@@ -52,7 +52,6 @@ done
 jaq -i '.menuOptions."System Settings".useZRAM.selected = "True"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
 jaq -i '.menuOptions."Battery Settings".idlemonChargingInMenu.selected = "30s"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
 jaq -i '.menuOptions."Battery Settings".shutdownFromSleep.selected = "Off"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
-jaq -i '.menuOptions."Network Settings".syncBeforeLaunch.selected = "False"' "${TMP_DIR}${REL_DIR}Saves/spruce/spruce-config.json"
 
 # Remove dev flag for releases
 if [ "$1" = "release" ]; then
