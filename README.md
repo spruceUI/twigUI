@@ -1,3 +1,5 @@
+# DEVELOPMENT HAS MOVED TO: https://github.com/spruceUI/twigUI-next/
+
 # twigUI
 spruceOS for the GKD Pixel 2.
 
